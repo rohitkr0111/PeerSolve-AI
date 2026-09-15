@@ -1,0 +1,2 @@
+export function format(value:string){return value.toLowerCase().split("_").map(part=>part[0].toUpperCase()+part.slice(1)).join(" ");}
+export function Badge({value}:{value:string}){return <span className={`rounded-full px-2.5 py-1 text-xs font-bold ${value==="EASY"?"bg-emerald-400/10 text-emerald-300":value==="MEDIUM"?"bg-amber-400/10 text-amber-300":"bg-rose-400/10 text-rose-300"}`}>{format(value)}</span>}
