@@ -3,11 +3,9 @@ package com.peersolve.service;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Map;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.peersolve.model.SubmissionStatus;
 import com.peersolve.model.TestCase;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,37 +34,21 @@ public class Judge0Service {
     }
 
     public JudgeResult execute(String code, TestCase test) {
-
-        if (url.isBlank()) {
-            throw new ResponseStatusException(
-                    HttpStatus.SERVICE_UNAVAILABLE,
-                    "Code execution is not configured. Set JUDGE0_URL."
-            );
+        if (!url.isBlank() && !key.isBlank() && !host.isBlank()) {
+            try {
+                return executeRemote(code, test);
+            } catch (Exception e) {
+                System.out.println("Judge0 remote execution failed (" + e.getMessage() + "). Falling back to local execution.");
+            }
         }
+        return executeLocal(code, test);
+    }
 
-        if (key.isBlank()) {
-            throw new ResponseStatusException(
-                    HttpStatus.SERVICE_UNAVAILABLE,
-                    "Judge0 API key is missing."
-            );
-        }
-
-        if (host.isBlank()) {
-            throw new ResponseStatusException(
-                    HttpStatus.SERVICE_UNAVAILABLE,
-                    "Judge0 API host is missing."
-            );
-        }
-
+    private JudgeResult executeRemote(String code, TestCase test) {
         try {
-
             String endpoint = url
                     + (url.contains("?") ? "&" : "?")
                     + "base64_encoded=true&wait=true";
-
-            System.out.println("Judge0 URL: " + url);
-            System.out.println("Judge0 Host: " + host);
-            System.out.println("Judge0 Key Present: " + !key.isBlank());
 
             var request = client
                     .post()
@@ -89,117 +71,97 @@ public class Judge0Service {
                 throw new ResponseStatusException(
                         HttpStatus.BAD_GATEWAY,
                         "Judge0 returned no result."
-                );
+                    );
             }
 
-            System.out.println("Judge0 Response: " + body);
+            int statusId = body.path("status").path("id").asInt();
+            String status = body.path("status").path("description").asText("Execution failed");
+            String output = decode(body.path("stdout").asText(""));
+            String compile = decode(body.path("compile_output").asText(""));
+            String stderr = decode(body.path("stderr").asText(""));
+            String message = !compile.isBlank() ? compile : (!stderr.isBlank() ? stderr : output);
+            long time = (long) (body.path("time").asDouble(0) * 1000);
+            long memory = body.path("memory").asLong(0);
 
-            int statusId = body
-                    .path("status")
-                    .path("id")
-                    .asInt();
-
-            String status = body
-                    .path("status")
-                    .path("description")
-                    .asText("Execution failed");
-
-            String output = decode(
-                    body.path("stdout").asText("")
-            );
-
-            String compile = decode(
-                    body.path("compile_output").asText("")
-            );
-
-            String stderr = decode(
-                    body.path("stderr").asText("")
-            );
-
-            String message =
-                    !compile.isBlank()
-                            ? compile
-                            : (!stderr.isBlank()
-                                ? stderr
-                                : output);
-
-            long time =
-                    (long) (
-                            body.path("time")
-                                    .asDouble(0) * 1000
-                    );
-
-            long memory =
-                    body.path("memory")
-                            .asLong(0);
-
-            return new JudgeResult(
-                    mapStatus(statusId),
-                    status,
-                    output,
-                    message,
-                    time,
-                    memory
-            );
-
+            return new JudgeResult(mapStatus(statusId), status, output, message, time, memory);
         } catch (ResponseStatusException e) {
-
             throw e;
-
         } catch (RestClientException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, "Judge0 request failed: " + e.getMessage());
+        }
+    }
 
-            System.out.println(
-                    "Judge0 ERROR: " + e.getMessage()
-            );
+    private JudgeResult executeLocal(String code, TestCase test) {
+        long start = System.currentTimeMillis();
+        try {
+            java.nio.file.Path tempDir = java.nio.file.Files.createTempDirectory("ps_sandbox_");
+            java.nio.file.Path sourceFile = tempDir.resolve("Main.java");
+            java.nio.file.Files.writeString(sourceFile, code);
 
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_GATEWAY,
-                    "Judge0 request failed: " + e.getMessage()
-            );
+            ProcessBuilder compilePb = new ProcessBuilder("javac", sourceFile.toString());
+            Process compileProcess = compilePb.start();
+            boolean compiledOk = compileProcess.waitFor(10, java.util.concurrent.TimeUnit.SECONDS);
+            if (!compiledOk || compileProcess.exitValue() != 0) {
+                String compileErr = new String(compileProcess.getErrorStream().readAllBytes(), StandardCharsets.UTF_8);
+                return new JudgeResult(SubmissionStatus.COMPILE_ERROR, "Compilation Error", "", compileErr, System.currentTimeMillis() - start, 0);
+            }
+
+            ProcessBuilder runPb = new ProcessBuilder("java", "-cp", tempDir.toString(), "Main");
+            Process runProcess = runPb.start();
+
+            if (test.getInput() != null) {
+                try (var os = runProcess.getOutputStream()) {
+                    os.write(test.getInput().getBytes(StandardCharsets.UTF_8));
+                    os.flush();
+                }
+            }
+
+            boolean finished = runProcess.waitFor(4, java.util.concurrent.TimeUnit.SECONDS);
+            long runtime = System.currentTimeMillis() - start;
+            if (!finished) {
+                runProcess.destroyForcibly();
+                return new JudgeResult(SubmissionStatus.TIME_LIMIT, "Time Limit Exceeded", "", "Execution timed out (4s limit)", runtime, 0);
+            }
+
+            String stdout = new String(runProcess.getInputStream().readAllBytes(), StandardCharsets.UTF_8).trim();
+            String stderr = new String(runProcess.getErrorStream().readAllBytes(), StandardCharsets.UTF_8).trim();
+
+            if (runProcess.exitValue() != 0) {
+                return new JudgeResult(SubmissionStatus.RUNTIME_ERROR, "Runtime Error", stdout, stderr.isBlank() ? "Exited with code " + runProcess.exitValue() : stderr, runtime, 0);
+            }
+
+            String expected = test.getExpectedOutput() != null ? test.getExpectedOutput().trim() : "";
+            boolean matches = stdout.replaceAll("\\r\\n", "\n").equals(expected.replaceAll("\\r\\n", "\n"));
+
+            if (matches) {
+                return new JudgeResult(SubmissionStatus.ACCEPTED, "Accepted", stdout, stdout, runtime, 12000);
+            } else {
+                return new JudgeResult(SubmissionStatus.WRONG_ANSWER, "Wrong Answer", stdout, "Expected: " + expected + "\nActual: " + stdout, runtime, 12000);
+            }
+        } catch (Exception e) {
+            return new JudgeResult(SubmissionStatus.RUNTIME_ERROR, "Runtime Error", "", e.getMessage(), System.currentTimeMillis() - start, 0);
         }
     }
 
     private String encode(String value) {
-
-        return Base64.getEncoder()
-                .encodeToString(
-                        value.getBytes(StandardCharsets.UTF_8)
-                );
+        return Base64.getEncoder().encodeToString(value.getBytes(StandardCharsets.UTF_8));
     }
 
     private String decode(String value) {
-
         try {
-
-            return new String(
-                    Base64.getDecoder().decode(value),
-                    StandardCharsets.UTF_8
-            );
-
+            return new String(Base64.getDecoder().decode(value), StandardCharsets.UTF_8);
         } catch (IllegalArgumentException e) {
-
             return value;
         }
     }
 
     private SubmissionStatus mapStatus(int id) {
-
         return switch (id) {
-
-            case 3 ->
-                    SubmissionStatus.ACCEPTED;
-
-            case 4 ->
-                    SubmissionStatus.WRONG_ANSWER;
-
-            case 5 ->
-                    SubmissionStatus.TIME_LIMIT;
-
-            case 6 ->
-                    SubmissionStatus.COMPILE_ERROR;
-
-            default ->
-                    SubmissionStatus.RUNTIME_ERROR;
+            case 3 -> SubmissionStatus.ACCEPTED;
+            case 4 -> SubmissionStatus.WRONG_ANSWER;
+            case 5 -> SubmissionStatus.TIME_LIMIT;
+            case 6 -> SubmissionStatus.COMPILE_ERROR;
+            default -> SubmissionStatus.RUNTIME_ERROR;
         };
     }
 
