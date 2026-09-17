@@ -3,180 +3,233 @@
 import Link from "next/link";
 import { useState } from "react";
 import {
-  Gamepad2,
-  Sparkles,
-  Bot,
-  Skull,
-  GitBranch,
-  Trophy,
   ArrowRight,
-  CheckCircle2,
-  Cpu,
-  Flame,
-  Zap,
-  Play,
   Terminal,
-  ShieldAlert
+  BrainCircuit,
+  Bot,
+  Zap,
+  GitBranch,
+  Target,
+  CheckCircle2,
+  Check,
+  ChevronRight,
+  Code2,
+  BarChart3,
+  Layers,
+  Sparkles,
+  HelpCircle
 } from "lucide-react";
 import { sound } from "@/lib/sound";
 
 export default function HomePage() {
-  const [selectedDemoTab, setSelectedDemoTab] = useState<"brute" | "mentor" | "optimized">("mentor");
+  // Interactive Simulator Tab state
+  const [selectedDemoTab, setSelectedDemoTab] = useState<"attempt" | "diagnosis" | "challenge" | "adaptive">("diagnosis");
+  
+  // Interactive Micro-Challenge selection on landing page
+  const [selectedChoice, setSelectedChoice] = useState<number | null>(null);
+  const [choiceSubmitted, setChoiceSubmitted] = useState(false);
+
+  const learningLoop = [
+    {
+      num: "01",
+      step: "ATTEMPT",
+      title: "Real Code Execution",
+      desc: "Student writes Java/DSA code and executes against rigorous test suites.",
+      icon: Terminal,
+      highlight: "border-zinc-800 bg-zinc-900/60 text-zinc-300"
+    },
+    {
+      num: "02",
+      step: "AI ANALYSIS",
+      title: "Deep Thinking Trace",
+      desc: "PeerSolve inspects loop invariants, nested lookups, and memory allocations.",
+      icon: BrainCircuit,
+      highlight: "border-zinc-800 bg-zinc-900/60 text-zinc-300"
+    },
+    {
+      num: "03",
+      step: "MISCONCEPTION",
+      title: "Root Cause Isolation",
+      desc: "Identifies whether the issue is algorithmic, boundary drift, or spatial awareness.",
+      icon: Bot,
+      highlight: "border-indigo-500/30 bg-indigo-500/10 text-indigo-300"
+    },
+    {
+      num: "04",
+      step: "TARGETED INTERVENTION",
+      title: "Socratic Guidance",
+      desc: "Provides progressive conceptual clues without spoiling the answer.",
+      icon: Zap,
+      highlight: "border-zinc-800 bg-zinc-900/60 text-zinc-300"
+    },
+    {
+      num: "05",
+      step: "MICRO-CHALLENGE",
+      title: "Active Mental Check",
+      desc: "A 30-second concept check verifies understanding before rewriting code.",
+      icon: HelpCircle,
+      highlight: "border-amber-500/30 bg-amber-500/10 text-amber-300"
+    },
+    {
+      num: "06",
+      step: "ADAPTIVE NEXT STEP",
+      title: "Calibrated Progression",
+      desc: "Dynamically selects the next problem tailored to fix identified weaknesses.",
+      icon: Target,
+      highlight: "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+    }
+  ];
+
+  const microOptions = [
+    { id: 0, label: "Array (linear scan)", correct: false, expl: "A linear scan takes O(n) per check, keeping total complexity at O(n²)." },
+    { id: 1, label: "HashSet (hash lookup)", correct: true, expl: "HashSet offers O(1) average lookup time, dropping overall runtime to O(n)." },
+    { id: 2, label: "Stack (LIFO order)", correct: false, expl: "Stack only grants immediate O(1) access to the top element, not arbitrary lookups." },
+    { id: 3, label: "Queue (FIFO order)", correct: false, expl: "Queue only grants immediate access to the front element, requiring full scan." }
+  ];
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-cyan-500 selection:text-slate-950">
-      {/* Background glow meshes */}
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -top-40 left-1/2 h-[500px] w-[800px] -translate-x-1/2 rounded-full bg-cyan-500/10 blur-[140px]" />
-        <div className="absolute top-[40%] right-[-10%] h-[450px] w-[500px] rounded-full bg-indigo-500/10 blur-[140px]" />
-        <div className="absolute bottom-[-10%] left-[-10%] h-[400px] w-[500px] rounded-full bg-emerald-500/10 blur-[140px]" />
-      </div>
-
-      {/* Top Navbar */}
-      <header className="relative z-20 border-b border-slate-800/80 bg-slate-950/60 backdrop-blur-md">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 selection:bg-indigo-500 selection:text-white">
+      {/* Top Navigation */}
+      <header className="sticky top-0 z-50 border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
           <Link
             href="/"
             onClick={() => sound.playClick()}
-            className="flex items-center gap-2 text-xl font-extrabold tracking-wider"
+            className="flex items-center gap-2.5 text-base font-bold tracking-tight text-white"
           >
-            <span className="bg-gradient-to-r from-cyan-400 via-teal-300 to-indigo-400 bg-clip-text text-transparent">
-              PEERSOLVE
-            </span>
-            <span className="rounded border border-cyan-500/30 bg-cyan-500/10 px-1.5 py-0.5 font-mono text-[10px] font-bold text-cyan-400">
-              RPG
+            <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-indigo-600 text-xs font-bold text-white shadow-sm shadow-indigo-600/30">
+              P
+            </div>
+            <span className="font-semibold tracking-tight">Peer<span className="text-indigo-400">Solve</span></span>
+            <span className="hidden rounded-full border border-zinc-800 bg-zinc-900 px-2 py-0.5 text-[10px] font-medium text-zinc-400 sm:inline-block">
+              Adaptive AI
             </span>
           </Link>
 
-          <div className="hidden items-center gap-8 text-sm font-semibold text-slate-400 md:flex">
-            <a href="#loop" className="transition hover:text-cyan-400">Game Loop</a>
-            <a href="#simulation" className="transition hover:text-cyan-400">Mission Simulator</a>
-            <a href="#boss" className="transition hover:text-cyan-400">Boss Encounters</a>
-            <a href="#skill-tree" className="transition hover:text-cyan-400">Skill Tree</a>
+          <div className="hidden items-center gap-8 text-xs font-medium text-zinc-400 md:flex">
+            <a href="#learning-loop" className="transition hover:text-white">Learning Loop</a>
+            <a href="#ai-diagnosis" className="transition hover:text-white">AI Diagnosis</a>
+            <a href="#micro-challenge" className="transition hover:text-white">Micro-Challenges</a>
+            <a href="#curriculum" className="transition hover:text-white">Curriculum</a>
           </div>
 
           <div className="flex items-center gap-3">
             <Link
               href="/login"
               onClick={() => sound.playClick()}
-              className="rounded-xl border border-slate-800 px-4 py-2 text-sm font-semibold text-slate-300 transition hover:bg-slate-900"
+              className="rounded-xl border border-zinc-800 bg-zinc-900/80 px-3.5 py-1.5 text-xs font-medium text-zinc-300 transition hover:border-zinc-700 hover:text-white"
             >
               Sign In
             </Link>
             <Link
               href="/register"
               onClick={() => sound.playClick()}
-              className="group flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-400 to-indigo-500 px-5 py-2 text-sm font-bold text-slate-950 shadow-lg shadow-cyan-500/20 transition-all hover:opacity-90"
+              className="flex items-center gap-1.5 rounded-xl bg-indigo-600 px-3.5 py-1.5 text-xs font-medium text-white shadow-sm shadow-indigo-600/20 transition hover:bg-indigo-500"
             >
-              <span>Play Now</span>
-              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              <span>Start Learning</span>
+              <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <section className="relative z-10 mx-auto max-w-7xl px-6 pt-16 pb-24 text-center sm:pt-24">
-        <div className="inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-4 py-1.5 text-xs font-bold tracking-widest text-cyan-300">
-          <Gamepad2 className="h-4 w-4 text-cyan-400" />
-          <span>INTERACTIVE GAME-BASED LEARNING ENGINE</span>
-        </div>
+      <section className="relative overflow-hidden px-6 pt-20 pb-16 md:pt-28 md:pb-24">
+        <div className="mx-auto max-w-4xl text-center">
+          <div className="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900/80 px-3 py-1 text-xs text-zinc-300 backdrop-blur">
+            <span className="h-1.5 w-1.5 rounded-full bg-indigo-400 animate-pulse" />
+            <span>AI-Native Coding Education</span>
+            <span className="text-zinc-600">|</span>
+            <span className="text-zinc-400">Beyond test pass/fail</span>
+          </div>
 
-        <h1 className="mx-auto mt-8 max-w-4xl text-5xl font-black tracking-tight sm:text-7xl">
-          Don&apos;t Just Study Code.{" "}
-          <span className="bg-gradient-to-r from-cyan-400 via-teal-300 to-indigo-400 bg-clip-text text-transparent">
-            Play It. Master It.
-          </span>
-        </h1>
+          <h1 className="mt-7 text-4xl font-extrabold tracking-tight text-white sm:text-6xl sm:leading-[1.1]">
+            Don&apos;t just solve more problems.<br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-zinc-100 via-zinc-200 to-zinc-400">
+              Learn from the way you solve them.
+            </span>
+          </h1>
 
-        <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-400 sm:text-xl">
-          Enter a living algorithmic world where DSA isn&apos;t endless LeetCode flashcards.
-          Solve real missions, get guided by tactical AI mentors, dismantle boss encounters,
-          and unlock your visual skill tree.
-        </p>
+          <p className="mx-auto mt-6 max-w-2xl text-base text-zinc-400 sm:text-lg">
+            PeerSolve analyzes your coding approach, identifies misconceptions in real time, and dynamically adapts what you learn next.
+          </p>
 
-        <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-          <Link
-            href="/register"
-            onClick={() => sound.playClick()}
-            className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-400 via-teal-300 to-indigo-500 px-8 py-4 font-bold text-slate-950 shadow-xl shadow-cyan-500/25 transition-all hover:scale-105"
-          >
-            <Play className="h-5 w-5 fill-slate-950" />
-            <span>Launch Player Campaign</span>
-          </Link>
-          <Link
-            href="/world"
-            onClick={() => sound.playClick()}
-            className="flex items-center gap-2 rounded-2xl border border-slate-800 bg-slate-900/80 px-8 py-4 font-bold text-slate-300 backdrop-blur-md transition-all hover:border-slate-700 hover:text-white"
-          >
-            <span>Explore Sectors</span>
-          </Link>
-        </div>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3.5">
+            <Link
+              href="/register"
+              onClick={() => sound.playClick()}
+              className="flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-medium text-white shadow-sm shadow-indigo-600/25 transition hover:bg-indigo-500"
+            >
+              <span>Start Learning</span>
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+            <a
+              href="#ai-diagnosis"
+              onClick={() => sound.playClick()}
+              className="rounded-xl border border-zinc-800 bg-zinc-900/80 px-5 py-3 text-sm font-medium text-zinc-300 transition hover:border-zinc-700 hover:text-white"
+            >
+              Explore How It Works
+            </a>
+          </div>
 
-        {/* Tactical HUD Snapshot */}
-        <div className="mx-auto mt-14 max-w-4xl rounded-2xl border border-slate-800 bg-slate-900/40 p-4 backdrop-blur-xl sm:p-6">
-          <div className="grid grid-cols-2 gap-4 text-left sm:grid-cols-4">
-            <div className="border-r border-slate-800/80 pr-4">
-              <span className="font-mono text-xs text-slate-400">ACTIVE WORLDS</span>
-              <p className="mt-1 text-2xl font-bold text-slate-100">3 Sectors</p>
-              <span className="text-[11px] text-cyan-400">Arrays → Two Pointer → Hashing</span>
+          {/* Quick Stats Banner */}
+          <div className="mt-14 grid grid-cols-2 gap-4 border-t border-zinc-800/80 pt-8 sm:grid-cols-4 text-left">
+            <div className="rounded-xl border border-zinc-800/60 bg-zinc-900/30 p-4">
+              <div className="text-xl font-bold text-white">AST-Level</div>
+              <div className="text-xs text-zinc-400 mt-0.5">Code reasoning analysis</div>
             </div>
-            <div className="border-r border-slate-800/80 pr-4">
-              <span className="font-mono text-xs text-slate-400">AI MENTOR</span>
-              <p className="mt-1 text-2xl font-bold text-slate-100">ADA-7 NPC</p>
-              <span className="text-[11px] text-emerald-400">Contextual Misconception Engine</span>
+            <div className="rounded-xl border border-zinc-800/60 bg-zinc-900/30 p-4">
+              <div className="text-xl font-bold text-white">3-Tier</div>
+              <div className="text-xs text-zinc-400 mt-0.5">Socratic hint progression</div>
             </div>
-            <div className="border-r border-slate-800/80 pr-4">
-              <span className="font-mono text-xs text-slate-400">BOSS BATTLES</span>
-              <p className="mt-1 text-2xl font-bold text-slate-100">4 Stages</p>
-              <span className="text-[11px] text-rose-400">Diagnose → Fix → Optimize → Explain</span>
+            <div className="rounded-xl border border-zinc-800/60 bg-zinc-900/30 p-4">
+              <div className="text-xl font-bold text-white">Targeted</div>
+              <div className="text-xs text-zinc-400 mt-0.5">Micro-challenge interventions</div>
             </div>
-            <div>
-              <span className="font-mono text-xs text-slate-400">PROGRESSION</span>
-              <p className="mt-1 text-2xl font-bold text-slate-100">XP &amp; Skill Tree</p>
-              <span className="text-[11px] text-amber-400">Real MongoDB Persisted Mastery</span>
+            <div className="rounded-xl border border-zinc-800/60 bg-zinc-900/30 p-4">
+              <div className="text-xl font-bold text-white">4-Stage</div>
+              <div className="text-xs text-zinc-400 mt-0.5">Topic mastery certification</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* The Core Game Loop */}
-      <section id="loop" className="relative z-10 border-t border-slate-800/80 bg-slate-900/20 py-24">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="text-center">
-            <p className="font-mono text-xs font-bold uppercase tracking-widest text-cyan-400">
-              LEARNING ARCHITECTURE
-            </p>
-            <h2 className="mt-3 text-3xl font-extrabold sm:text-5xl">The 7-Step Gameplay Loop</h2>
-            <p className="mx-auto mt-4 max-w-2xl text-slate-400">
-              Traditional platforms test you with questions and answers. PeerSolve immerses you in a gameplay progression cycle.
+      {/* The 6-Stage Learning Loop */}
+      <section id="learning-loop" className="border-t border-zinc-800/80 bg-zinc-950 px-6 py-20">
+        <div className="mx-auto max-w-7xl">
+          <div className="text-center max-w-2xl mx-auto mb-14">
+            <span className="text-xs font-semibold uppercase tracking-widest text-indigo-400">
+              THE ADAPTIVE ENGINE
+            </span>
+            <h2 className="mt-2 text-2xl font-bold text-white sm:text-3xl tracking-tight">
+              The PeerSolve Learning Loop
+            </h2>
+            <p className="mt-2 text-xs sm:text-sm text-zinc-400">
+              Instead of guessing answers, PeerSolve constructs an active mental model through deliberate, guided feedback.
             </p>
           </div>
 
-          <div className="mt-16 grid gap-4 sm:grid-cols-2 lg:grid-cols-7">
-            {[
-              { step: "01", title: "Learn", desc: "Briefing on problem & telemetry context", icon: Terminal, color: "text-cyan-400" },
-              { step: "02", title: "Play", desc: "Interactive in-editor code execution", icon: Play, color: "text-teal-400" },
-              { step: "03", title: "Fail Safely", desc: "System triggers real runtime test vector errors", icon: ShieldAlert, color: "text-rose-400" },
-              { step: "04", title: "AI Guidance", desc: "ADA-7 pinpoints the misconception & progressive hints", icon: Bot, color: "text-amber-400" },
-              { step: "05", title: "Improve", desc: "Refactor quadratic loops to O(1) lookups", icon: Zap, color: "text-indigo-400" },
-              { step: "06", title: "Defeat Boss", desc: "Multi-stage tactical boss confrontations", icon: Skull, color: "text-red-400" },
-              { step: "07", title: "Mastery", desc: "Unlock skill tree branches & level up XP", icon: Trophy, color: "text-emerald-400" }
-            ].map((item) => {
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {learningLoop.map((item) => {
               const Icon = item.icon;
               return (
                 <div
-                  key={item.step}
-                  className="group relative rounded-2xl border border-slate-800 bg-slate-900/40 p-5 transition-all hover:-translate-y-1 hover:border-cyan-500/40 hover:bg-slate-900/80"
+                  key={item.num}
+                  className="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-6 transition hover:border-zinc-700 hover:bg-zinc-900/70"
                 >
-                  <span className="font-mono text-xs font-bold text-slate-500 group-hover:text-cyan-400">
-                    {item.step}
-                  </span>
-                  <div className={`mt-3 flex h-10 w-10 items-center justify-center rounded-xl bg-slate-950 ${item.color}`}>
-                    <Icon className="h-5 w-5" />
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="font-mono text-xs font-bold text-zinc-500">{item.num}</span>
+                    <span className="rounded-md border border-zinc-800 bg-zinc-950 px-2 py-0.5 font-mono text-[10px] font-semibold text-zinc-400">
+                      {item.step}
+                    </span>
                   </div>
-                  <h3 className="mt-3 font-bold text-slate-100">{item.title}</h3>
-                  <p className="mt-1 text-xs text-slate-400">{item.desc}</p>
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className={`flex h-8 w-8 items-center justify-center rounded-lg border ${item.highlight}`}>
+                      <Icon className="h-4 w-4" />
+                    </div>
+                    <h3 className="text-sm font-semibold text-white">{item.title}</h3>
+                  </div>
+                  <p className="text-xs leading-relaxed text-zinc-400">{item.desc}</p>
                 </div>
               );
             })}
@@ -184,198 +237,385 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Interactive Simulation Showcase */}
-      <section id="simulation" className="relative z-10 border-t border-slate-800/80 py-24">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="grid items-center gap-12 lg:grid-cols-2">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 font-mono text-xs font-semibold text-amber-300">
-                <Bot className="h-3.5 w-3.5" />
-                <span>AI NOT A CHATBOT // REAL PEDAGOGICAL ENGINE</span>
-              </div>
-              <h2 className="mt-4 text-3xl font-extrabold sm:text-5xl">
-                Teaches Through Gameplay, Not Cheating.
-              </h2>
-              <p className="mt-4 text-slate-400">
-                Generic chatbots hand you the answer and rob you of learning. ADA-7 detects your specific algorithmic misconception (like checking every pair in nested loops) and provides 3-tier progressive hints.
-              </p>
+      {/* Interactive AI Diagnosis Experience */}
+      <section id="ai-diagnosis" className="border-t border-zinc-800/80 bg-zinc-900/20 px-6 py-20">
+        <div className="mx-auto max-w-6xl">
+          <div className="text-center max-w-2xl mx-auto mb-12">
+            <span className="text-xs font-semibold uppercase tracking-widest text-indigo-400">
+              CORE PRODUCT EXPERIENCE
+            </span>
+            <h2 className="mt-2 text-2xl font-bold text-white sm:text-3xl tracking-tight">
+              An Intelligent Code Review, Not Just &quot;Accepted&quot;
+            </h2>
+            <p className="mt-2 text-xs sm:text-sm text-zinc-400">
+              When you submit a solution that works but is quadratic, PeerSolve isolates the exact algorithmic pattern and teaches the mental shift.
+            </p>
+          </div>
 
-              <div className="mt-8 space-y-3">
-                <div className="flex items-start gap-3 rounded-xl border border-slate-800 bg-slate-900/40 p-3">
-                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-cyan-400" />
-                  <div>
-                    <p className="font-semibold text-slate-200">Misconception Detection</p>
-                    <p className="text-xs text-slate-400">Analyzes AST &amp; execution telemetry to explain why O(N²) quadratic loops choke on big inputs.</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3 rounded-xl border border-slate-800 bg-slate-900/40 p-3">
-                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-amber-400" />
-                  <div>
-                    <p className="font-semibold text-slate-200">Progressive 3-Tier Hints</p>
-                    <p className="text-xs text-slate-400">Tier 1 Conceptual Nudge → Tier 2 Algorithmic Direction → Tier 3 Tactical Blueprint.</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-3 rounded-xl border border-slate-800 bg-slate-900/40 p-3">
-                  <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-emerald-400" />
-                  <div>
-                    <p className="font-semibold text-slate-200">Adaptive Difficulty Engine</p>
-                    <p className="text-xs text-slate-400">Tracks attempt counts, hint penalties, and topic mastery to personalize the next mission.</p>
-                  </div>
-                </div>
+          {/* Interactive Playground Simulation */}
+          <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 shadow-2xl">
+            {/* Top Toolbar */}
+            <div className="flex flex-wrap items-center justify-between border-b border-zinc-800 bg-zinc-900/80 px-4 py-2.5">
+              <div className="flex items-center gap-2">
+                <span className="h-3 w-3 rounded-full bg-zinc-700" />
+                <span className="h-3 w-3 rounded-full bg-zinc-700" />
+                <span className="h-3 w-3 rounded-full bg-zinc-700" />
+                <span className="ml-2 font-mono text-xs text-zinc-400">Problem 01 · Contains Duplicate</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => setSelectedDemoTab("attempt")}
+                  className={`rounded-lg px-3 py-1 font-mono text-xs font-medium transition ${
+                    selectedDemoTab === "attempt" ? "bg-zinc-800 text-white" : "text-zinc-400 hover:text-zinc-200"
+                  }`}
+                >
+                  1. Student Code
+                </button>
+                <button
+                  onClick={() => setSelectedDemoTab("diagnosis")}
+                  className={`rounded-lg px-3 py-1 font-mono text-xs font-medium transition ${
+                    selectedDemoTab === "diagnosis" ? "bg-indigo-600/20 text-indigo-300 border border-indigo-500/30" : "text-zinc-400 hover:text-zinc-200"
+                  }`}
+                >
+                  2. AI Diagnosis
+                </button>
+                <button
+                  onClick={() => setSelectedDemoTab("challenge")}
+                  className={`rounded-lg px-3 py-1 font-mono text-xs font-medium transition ${
+                    selectedDemoTab === "challenge" ? "bg-zinc-800 text-white" : "text-zinc-400 hover:text-zinc-200"
+                  }`}
+                >
+                  3. Micro-Challenge
+                </button>
+                <button
+                  onClick={() => setSelectedDemoTab("adaptive")}
+                  className={`rounded-lg px-3 py-1 font-mono text-xs font-medium transition ${
+                    selectedDemoTab === "adaptive" ? "bg-zinc-800 text-white" : "text-zinc-400 hover:text-zinc-200"
+                  }`}
+                >
+                  4. Adaptive Next Step
+                </button>
               </div>
             </div>
 
-            {/* Interactive Terminal Demo Widget */}
-            <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 shadow-2xl shadow-cyan-950/30">
-              <div className="flex items-center justify-between border-b border-slate-800 bg-slate-900/80 px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <span className="h-3 w-3 rounded-full bg-rose-500/80" />
-                  <span className="h-3 w-3 rounded-full bg-amber-500/80" />
-                  <span className="h-3 w-3 rounded-full bg-emerald-500/80" />
-                  <span className="ml-2 font-mono text-xs text-slate-400">mission_simulation.java</span>
-                </div>
-                <div className="flex gap-1 font-mono text-xs">
-                  <button
-                    onClick={() => {
-                      sound.playClick();
-                      setSelectedDemoTab("brute");
-                    }}
-                    className={`rounded px-2 py-1 ${selectedDemoTab === "brute" ? "bg-rose-500/20 text-rose-300 border border-rose-500/40" : "text-slate-400"}`}
-                  >
-                    Attempt #1 (Naive)
-                  </button>
-                  <button
-                    onClick={() => {
-                      sound.playClick();
-                      setSelectedDemoTab("mentor");
-                    }}
-                    className={`rounded px-2 py-1 ${selectedDemoTab === "mentor" ? "bg-amber-500/20 text-amber-300 border border-amber-500/40" : "text-slate-400"}`}
-                  >
-                    ADA-7 Guidance
-                  </button>
-                  <button
-                    onClick={() => {
-                      sound.playClick();
-                      setSelectedDemoTab("optimized");
-                    }}
-                    className={`rounded px-2 py-1 ${selectedDemoTab === "optimized" ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40" : "text-slate-400"}`}
-                  >
-                    Attempt #2 (O(N))
-                  </button>
-                </div>
-              </div>
-
-              <div className="p-5 font-mono text-xs leading-relaxed">
-                {selectedDemoTab === "brute" && (
-                  <div className="space-y-3">
-                    <p className="text-slate-500">// Naive pair search: O(N²) nested loops</p>
-                    <pre className="text-rose-300">
-{`for (int i = 0; i < n; i++) {
-    for (int j = i + 1; j < n; j++) {
-        if (nums[i] + nums[j] == target) {
-            return new int[]{i, j};
+            {/* Tab Body */}
+            <div className="p-6">
+              {selectedDemoTab === "attempt" && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between text-xs text-zinc-400">
+                    <span>Submitted Java Solution (Functional but $O(N^2)$ Quadratic):</span>
+                    <span className="font-mono text-amber-400">Status: Passed Tests (Inefficient)</span>
+                  </div>
+                  <pre className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 font-mono text-xs leading-relaxed text-zinc-300 overflow-x-auto">
+{`public boolean containsDuplicate(int[] nums) {
+    // Student used nested loops to scan for identical values
+    for (int i = 0; i < nums.length; i++) {
+        for (int j = i + 1; j < nums.length; j++) {
+            if (nums[i] == nums[j]) {
+                return true;
+            }
         }
     }
+    return false;
 }`}
-                    </pre>
-                    <div className="rounded-lg border border-rose-500/30 bg-rose-950/30 p-3 text-rose-200">
-                      [FAILED] Quadratic loop detected. Telemetry: 450ms. Expected: O(N).
+                  </pre>
+                  <div className="text-right">
+                    <button
+                      onClick={() => setSelectedDemoTab("diagnosis")}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 py-1.5 text-xs font-medium text-white transition hover:bg-indigo-500"
+                    >
+                      <span>View AI Diagnosis</span>
+                      <ChevronRight className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {selectedDemoTab === "diagnosis" && (
+                <div className="space-y-5">
+                  <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4">
+                    <div className="flex items-center gap-2 text-xs font-bold text-amber-400 uppercase tracking-wide">
+                      <Bot className="h-4 w-4" />
+                      <span>AI DIAGNOSIS — LEARNING PATTERN RECOGNIZED</span>
+                    </div>
+                    <p className="mt-1.5 text-sm font-medium text-white">
+                      Your solution is logically correct, but your approach has an algorithmic bottleneck.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
+                      <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">Detected Pattern</span>
+                      <div className="mt-1 font-mono text-xs text-indigo-300 font-bold">Nested Iteration ($O(N^2)$ Complexity)</div>
+                      <p className="mt-1.5 text-xs text-zinc-400 leading-relaxed">
+                        For each element at index <code className="text-zinc-200">i</code>, the inner loop conducts a linear scan across the remaining array.
+                      </p>
+                    </div>
+
+                    <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-4">
+                      <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">What to Understand</span>
+                      <div className="mt-1 text-xs font-bold text-zinc-200">Repeated Search Redundancy</div>
+                      <p className="mt-1.5 text-xs text-zinc-400 leading-relaxed">
+                        You are re-scanning elements you have already seen. An auxiliary structure can remember previous values in $O(1)$ time.
+                      </p>
                     </div>
                   </div>
-                )}
 
-                {selectedDemoTab === "mentor" && (
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-cyan-400">
-                      <Bot className="h-4 w-4" />
-                      <span className="font-bold">ADA-7 // TACTICIAN INTERVENTION</span>
+                  <div className="rounded-xl border border-zinc-800 bg-zinc-900/30 p-4">
+                    <h4 className="text-xs font-bold text-zinc-200 uppercase tracking-wide">Why This Matters</h4>
+                    <p className="mt-1 text-xs text-zinc-400 leading-relaxed">
+                      With N = 100,000 elements, nested iteration performs ~5 billion operations (&gt; 5.0 seconds, Time Limit Exceeded). A single-pass approach with a hash lookup takes 100,000 operations (&asymp; 0.002s).
+                    </p>
+                  </div>
+
+                  <div className="flex justify-between items-center pt-2">
+                    <span className="text-xs text-zinc-500 font-mono">Next: Verify mental model</span>
+                    <button
+                      onClick={() => setSelectedDemoTab("challenge")}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 py-1.5 text-xs font-medium text-white transition hover:bg-indigo-500"
+                    >
+                      <span>Try Micro-Challenge</span>
+                      <ChevronRight className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {selectedDemoTab === "challenge" && (
+                <div className="space-y-4">
+                  <div className="rounded-xl border border-indigo-500/30 bg-indigo-500/5 p-4">
+                    <div className="flex items-center gap-2 text-xs font-bold text-indigo-400 uppercase tracking-wide">
+                      <Zap className="h-4 w-4" />
+                      <span>TARGETED MICRO-CHALLENGE</span>
                     </div>
-                    <div className="rounded-xl border border-amber-500/30 bg-amber-950/20 p-4 text-amber-200">
-                      <p className="font-semibold text-amber-300">Misconception: Quadratic Loop</p>
-                      <p className="mt-1 text-slate-300">
-                        &quot;Your solution is checking every possible pair. Can you find a way to remember numbers you&apos;ve already scanned instead of scanning the array again?&quot;
-                      </p>
-                      <div className="mt-3 rounded bg-slate-900/80 p-2 text-xs text-amber-300">
-                        💡 Tier 1 Hint: Store complement `target - nums[i]` in a HashMap for O(1) lookup!
+                    <p className="mt-1.5 text-sm text-zinc-200">
+                      You used nested loops to find duplicates. Before rewriting your code, answer this:
+                    </p>
+                    <p className="mt-1 text-sm font-semibold text-white">
+                      Which data structure allows checking whether an element was previously seen in $O(1)$ average time?
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+                    {microOptions.map((opt) => {
+                      const isSelected = selectedChoice === opt.id;
+                      return (
+                        <button
+                          key={opt.id}
+                          onClick={() => {
+                            setSelectedChoice(opt.id);
+                            setChoiceSubmitted(true);
+                            sound.playClick();
+                          }}
+                          className={`flex items-center justify-between rounded-xl border p-3 text-left transition ${
+                            isSelected
+                              ? opt.correct
+                                ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-200"
+                                : "border-rose-500/50 bg-rose-500/10 text-rose-200"
+                              : "border-zinc-800 bg-zinc-900/50 text-zinc-300 hover:border-zinc-700 hover:bg-zinc-900"
+                          }`}
+                        >
+                          <span className="text-xs font-medium">{opt.label}</span>
+                          {choiceSubmitted && isSelected && (
+                            opt.correct ? <Check className="h-4 w-4 text-emerald-400" /> : <span className="text-xs text-rose-400">Try again</span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {choiceSubmitted && selectedChoice !== null && (
+                    <div className={`rounded-xl border p-3.5 text-xs ${
+                      microOptions[selectedChoice].correct
+                        ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+                        : "border-rose-500/30 bg-rose-500/10 text-rose-300"
+                    }`}>
+                      <p className="font-semibold">{microOptions[selectedChoice].correct ? "Correct Choice!" : "Conceptual Clarification:"}</p>
+                      <p className="mt-0.5 text-zinc-300">{microOptions[selectedChoice].expl}</p>
+                    </div>
+                  )}
+
+                  <div className="flex justify-end pt-2">
+                    <button
+                      onClick={() => setSelectedDemoTab("adaptive")}
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 py-1.5 text-xs font-medium text-white transition hover:bg-indigo-500"
+                    >
+                      <span>See Adaptive Next Step</span>
+                      <ChevronRight className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {selectedDemoTab === "adaptive" && (
+                <div className="space-y-4">
+                  <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-4">
+                    <div className="flex items-center gap-2 text-xs font-bold text-emerald-400 uppercase tracking-wide">
+                      <Target className="h-4 w-4" />
+                      <span>DYNAMIC ADAPTIVE RECOMMENDATION</span>
+                    </div>
+                    <p className="mt-1.5 text-sm font-semibold text-white">
+                      Recommended Next Step: Two-Sum via Hash Table Lookup
+                    </p>
+                    <p className="mt-1 text-xs text-zinc-400">
+                      Reason: You understand linear array iteration. Now reinforce single-pass hashing before proceeding to dynamic programming.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                    <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-3.5">
+                      <div className="text-[11px] text-zinc-500 font-semibold uppercase">Array Traversal</div>
+                      <div className="mt-1 text-sm font-bold text-white">92% Mastery</div>
+                      <div className="mt-1.5 h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden">
+                        <div className="h-full bg-emerald-500 rounded-full w-[92%]" />
+                      </div>
+                    </div>
+                    <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-3.5">
+                      <div className="text-[11px] text-zinc-500 font-semibold uppercase">Hash-Based Optimization</div>
+                      <div className="mt-1 text-sm font-bold text-indigo-400">45% In Progress</div>
+                      <div className="mt-1.5 h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden">
+                        <div className="h-full bg-indigo-500 rounded-full w-[45%]" />
+                      </div>
+                    </div>
+                    <div className="rounded-xl border border-zinc-800 bg-zinc-900/40 p-3.5">
+                      <div className="text-[11px] text-zinc-500 font-semibold uppercase">Time Complexity Score</div>
+                      <div className="mt-1 text-sm font-bold text-amber-400">+28% Improvement</div>
+                      <div className="mt-1.5 h-1.5 w-full bg-zinc-800 rounded-full overflow-hidden">
+                        <div className="h-full bg-amber-500 rounded-full w-[65%]" />
                       </div>
                     </div>
                   </div>
-                )}
 
-                {selectedDemoTab === "optimized" && (
-                  <div className="space-y-3">
-                    <p className="text-slate-500">// Single pass O(N) HashMap solution</p>
-                    <pre className="text-emerald-300">
-{`Map<Integer, Integer> seen = new HashMap<>();
-for (int i = 0; i < n; i++) {
-    int complement = target - nums[i];
-    if (seen.containsKey(complement)) {
-        return new int[]{seen.get(complement), i};
-    }
-    seen.put(nums[i], i);
-}`}
-                    </pre>
-                    <div className="rounded-lg border border-emerald-500/30 bg-emerald-950/30 p-3 text-emerald-200">
-                      [PASSED] Accepted! Runtime: 1ms (O(N) linear time). +150 XP awarded!
-                    </div>
+                  <div className="pt-2 text-center">
+                    <Link
+                      href="/register"
+                      className="inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-xs font-medium text-white transition hover:bg-indigo-500"
+                    >
+                      <span>Create Account &amp; Start Curriculum</span>
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
                   </div>
-                )}
-              </div>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </section>
 
-      {/* Boss Battles Section */}
-      <section id="boss" className="relative z-10 border-t border-slate-800/80 bg-slate-900/20 py-24">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="rounded-3xl border border-rose-500/30 bg-gradient-to-br from-slate-950 via-slate-900 to-rose-950/20 p-8 shadow-2xl sm:p-12">
-            <div className="max-w-3xl">
-              <div className="inline-flex items-center gap-2 rounded-full border border-rose-500/40 bg-rose-500/10 px-3 py-1 font-mono text-xs font-bold text-rose-400">
-                <Skull className="h-4 w-4" />
-                <span>EPIC BOSS ENCOUNTER</span>
-              </div>
-              <h2 className="mt-4 text-3xl font-black sm:text-5xl">
-                Boss: The Chrono-Consumer
-              </h2>
-              <p className="mt-2 text-lg font-semibold text-rose-300">
-                Guardian of the Quadratic Abyss • 4 Tactical Stages
-              </p>
-              <p className="mt-4 text-slate-400">
-                Boss battles test multiple algorithmic competencies in sequence. You don&apos;t just code — you diagnose bugs, patch implementations, optimize memory under strict telemetry, and defend your trade-offs to the AI Mentor.
-              </p>
+      {/* Curriculum Tracks Preview */}
+      <section id="curriculum" className="border-t border-zinc-800/80 bg-zinc-950 px-6 py-20">
+        <div className="mx-auto max-w-7xl">
+          <div className="text-center max-w-2xl mx-auto mb-14">
+            <span className="text-xs font-semibold uppercase tracking-widest text-indigo-400">
+              STRUCTURED CURRICULUM
+            </span>
+            <h2 className="mt-2 text-2xl font-bold text-white sm:text-3xl tracking-tight">
+              Deliberate Learning Paths
+            </h2>
+            <p className="mt-2 text-xs sm:text-sm text-zinc-400">
+              Each topic module integrates concept lessons, deliberate practice, edge-case analysis, and verifiable 4-stage mastery milestones.
+            </p>
+          </div>
 
-              <div className="mt-8 grid gap-3 sm:grid-cols-4">
-                <div className="rounded-xl border border-rose-500/20 bg-slate-900/80 p-3">
-                  <span className="font-mono text-xs font-bold text-rose-400">STAGE 1</span>
-                  <p className="font-bold text-slate-200">Diagnose</p>
-                  <p className="text-[11px] text-slate-400">Spot infinite recursion loop</p>
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+            {/* Track 1 */}
+            <div className="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-6 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="rounded-md border border-zinc-800 bg-zinc-950 px-2 py-0.5 font-mono text-[10px] font-semibold text-zinc-400">Track 01</span>
+                  <span className="text-xs font-semibold text-emerald-400">80% Mastery</span>
                 </div>
-                <div className="rounded-xl border border-rose-500/20 bg-slate-900/80 p-3">
-                  <span className="font-mono text-xs font-bold text-rose-400">STAGE 2</span>
-                  <p className="font-bold text-slate-200">Fix</p>
-                  <p className="text-[11px] text-slate-400">Patch pointer boundary code</p>
-                </div>
-                <div className="rounded-xl border border-rose-500/20 bg-slate-900/80 p-3">
-                  <span className="font-mono text-xs font-bold text-rose-400">STAGE 3</span>
-                  <p className="font-bold text-slate-200">Optimize</p>
-                  <p className="text-[11px] text-slate-400">Achieve single-pass O(N)</p>
-                </div>
-                <div className="rounded-xl border border-rose-500/20 bg-slate-900/80 p-3">
-                  <span className="font-mono text-xs font-bold text-rose-400">STAGE 4</span>
-                  <p className="font-bold text-slate-200">Explain</p>
-                  <p className="text-[11px] text-slate-400">AI Mentor oral defense</p>
+                <h3 className="mt-4 text-base font-bold text-white">Arrays &amp; Linear Traversal</h3>
+                <p className="mt-1.5 text-xs text-zinc-400 leading-relaxed">
+                  Memory layout, continuous indexing, in-place swaps, and avoiding index out-of-bounds traps.
+                </p>
+                <div className="mt-4 space-y-1.5 text-xs text-zinc-400">
+                  <div className="flex items-center gap-2 text-zinc-300">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                    <span>Linear Scanning &amp; Boundary Guards</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-zinc-300">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                    <span>Prefix Sums &amp; Running Products</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-zinc-300">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                    <span>Mastery Milestone: Array Diagnostics</span>
+                  </div>
                 </div>
               </div>
+              <div className="mt-6 pt-4 border-t border-zinc-800/80">
+                <Link href="/world" className="flex items-center justify-between text-xs font-semibold text-indigo-400 hover:text-indigo-300">
+                  <span>Enter Track</span>
+                  <ChevronRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
 
-              <div className="mt-8">
-                <Link
-                  href="/boss/boss-chrono-consumer"
-                  onClick={() => sound.playClick()}
-                  className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-rose-500 to-amber-500 px-6 py-3 font-bold text-slate-950 shadow-lg shadow-rose-500/20 transition hover:opacity-95"
-                >
-                  <Skull className="h-5 w-5" />
-                  <span>Enter Boss Arena</span>
+            {/* Track 2 */}
+            <div className="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-6 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="rounded-md border border-zinc-800 bg-zinc-950 px-2 py-0.5 font-mono text-[10px] font-semibold text-zinc-400">Track 02</span>
+                  <span className="text-xs font-semibold text-indigo-400">60% Mastery</span>
+                </div>
+                <h3 className="mt-4 text-base font-bold text-white">Searching &amp; Two Pointers</h3>
+                <p className="mt-1.5 text-xs text-zinc-400 leading-relaxed">
+                  Inward converging pointers, sliding windows, monotonic properties, and logarithmic search.
+                </p>
+                <div className="mt-4 space-y-1.5 text-xs text-zinc-400">
+                  <div className="flex items-center gap-2 text-zinc-300">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                    <span>Inward Converging Pointers</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-zinc-300">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-indigo-400" />
+                    <span>Binary Search Boundary Invariants</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-zinc-500">
+                    <span className="h-3.5 w-3.5 rounded-full border border-zinc-700 flex items-center justify-center text-[9px]">·</span>
+                    <span>Mastery Milestone: Pointer Optimization</span>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-6 pt-4 border-t border-zinc-800/80">
+                <Link href="/world" className="flex items-center justify-between text-xs font-semibold text-indigo-400 hover:text-indigo-300">
+                  <span>Enter Track</span>
+                  <ChevronRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+
+            {/* Track 3 */}
+            <div className="rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-6 flex flex-col justify-between">
+              <div>
+                <div className="flex items-center justify-between">
+                  <span className="rounded-md border border-zinc-800 bg-zinc-950 px-2 py-0.5 font-mono text-[10px] font-semibold text-zinc-400">Track 03</span>
+                  <span className="text-xs font-semibold text-zinc-500">30% Mastery</span>
+                </div>
+                <h3 className="mt-4 text-base font-bold text-white">Hash Tables &amp; Frequency Maps</h3>
+                <p className="mt-1.5 text-xs text-zinc-400 leading-relaxed">
+                  Trading $O(N)$ space for $O(1)$ lookups, collision handling, and complement pairing.
+                </p>
+                <div className="mt-4 space-y-1.5 text-xs text-zinc-400">
+                  <div className="flex items-center gap-2 text-zinc-300">
+                    <CheckCircle2 className="h-3.5 w-3.5 text-indigo-400" />
+                    <span>Single-Pass Complement Lookup</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-zinc-500">
+                    <span className="h-3.5 w-3.5 rounded-full border border-zinc-700 flex items-center justify-center text-[9px]">·</span>
+                    <span>Frequency Bucket Counter</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-zinc-500">
+                    <span className="h-3.5 w-3.5 rounded-full border border-zinc-700 flex items-center justify-center text-[9px]">·</span>
+                    <span>Mastery Milestone: Hash Table Defense</span>
+                  </div>
+                </div>
+              </div>
+              <div className="mt-6 pt-4 border-t border-zinc-800/80">
+                <Link href="/world" className="flex items-center justify-between text-xs font-semibold text-indigo-400 hover:text-indigo-300">
+                  <span>Enter Track</span>
+                  <ChevronRight className="h-4 w-4" />
                 </Link>
               </div>
             </div>
@@ -383,32 +623,22 @@ for (int i = 0; i < n; i++) {
         </div>
       </section>
 
-      {/* Call to Action Footer */}
-      <footer className="relative z-10 border-t border-slate-800 py-16 text-center">
-        <div className="mx-auto max-w-7xl px-6">
-          <h2 className="text-3xl font-extrabold sm:text-4xl">Ready to Start Your Journey?</h2>
-          <p className="mt-2 text-slate-400">
-            Create your player profile, calibrate your skill tree, and conquer the Silicon Plains.
-          </p>
-          <div className="mt-8 flex justify-center gap-4">
-            <Link
-              href="/register"
-              onClick={() => sound.playClick()}
-              className="rounded-2xl bg-gradient-to-r from-cyan-400 to-indigo-500 px-8 py-3.5 font-bold text-slate-950 shadow-xl shadow-cyan-500/25 transition hover:scale-105"
-            >
-              Get Started Free
-            </Link>
-            <Link
-              href="/login"
-              onClick={() => sound.playClick()}
-              className="rounded-2xl border border-slate-800 px-8 py-3.5 font-bold text-slate-300 transition hover:bg-slate-900"
-            >
-              Player Login
-            </Link>
+      {/* CTA Footer */}
+      <footer className="border-t border-zinc-800/80 bg-zinc-950 px-6 py-12">
+        <div className="mx-auto max-w-7xl flex flex-col md:flex-row items-center justify-between gap-6 text-xs text-zinc-500">
+          <div className="flex items-center gap-2">
+            <div className="flex h-5 w-5 items-center justify-center rounded bg-indigo-600 font-bold text-white text-[10px]">
+              P
+            </div>
+            <span className="font-semibold text-zinc-300">PeerSolve</span>
+            <span>· AI-Native Adaptive Coding Platform</span>
           </div>
-          <p className="mt-12 text-xs text-slate-600">
-            PeerSolve RPG • Powered by Next.js, Spring Boot, MongoDB Atlas &amp; Ada-7 Tactician AI
-          </p>
+          <div className="flex items-center gap-6">
+            <Link href="/world" className="hover:text-zinc-300 transition">Learn</Link>
+            <Link href="/problems" className="hover:text-zinc-300 transition">Practice</Link>
+            <Link href="/dashboard" className="hover:text-zinc-300 transition">Progress</Link>
+            <Link href="/login" className="hover:text-zinc-300 transition">Sign In</Link>
+          </div>
         </div>
       </footer>
     </div>

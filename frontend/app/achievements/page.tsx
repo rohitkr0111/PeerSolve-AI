@@ -7,7 +7,7 @@ import {
   CheckCircle2,
   Crosshair,
   Zap,
-  Skull,
+  Target,
   Gauge,
   Shield,
   Bot
@@ -36,14 +36,14 @@ export default function AchievementsPage() {
   }, [router]);
 
   const getIcon = (iconName: string, unlocked: boolean) => {
-    const cls = `h-7 w-7 ${unlocked ? "text-amber-400" : "text-slate-600"}`;
+    const cls = `h-5 w-5 ${unlocked ? "text-indigo-400" : "text-zinc-600"}`;
     switch (iconName) {
       case "Crosshair":
         return <Crosshair className={cls} />;
       case "Zap":
         return <Zap className={cls} />;
       case "Skull":
-        return <Skull className={cls} />;
+        return <Target className={cls} />;
       case "Gauge":
         return <Gauge className={cls} />;
       case "Shield":
@@ -53,105 +53,85 @@ export default function AchievementsPage() {
     }
   };
 
-  const getRarityBadge = (rarity: string) => {
-    switch (rarity) {
-      case "LEGENDARY":
-        return "border-amber-500/50 bg-amber-500/10 text-amber-300";
-      case "EPIC":
-        return "border-purple-500/50 bg-purple-500/10 text-purple-300";
-      case "RARE":
-        return "border-cyan-500/50 bg-cyan-500/10 text-cyan-300";
-      default:
-        return "border-slate-700 bg-slate-800 text-slate-300";
-    }
-  };
-
-  const unlockedCount = achievements.filter((a) => a.unlocked).length;
-
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 text-slate-100">
+      <div className="min-h-screen bg-zinc-950 text-zinc-100">
         <GameNav />
-        <main className="grid min-h-[70vh] place-items-center font-mono text-sm text-cyan-400">
+        <main className="grid min-h-[70vh] place-items-center text-xs text-zinc-400">
           <div className="flex items-center gap-3">
-            <Bot className="h-5 w-5 animate-spin" />
-            <span>RETRIEVING TROPHY VAULT ARCHIVES...</span>
+            <Bot className="h-4 w-4 animate-spin text-indigo-400" />
+            <span>Loading certifications...</span>
           </div>
         </main>
       </div>
     );
   }
 
+  const unlockedCount = achievements.filter((a) => a.unlocked).length;
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100">
       <GameNav />
 
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-        {/* Header */}
+      <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
         <div className="mb-8 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 font-mono text-xs font-semibold text-amber-300">
-              <Award className="h-3.5 w-3.5" />
-              <span>TACTICAL HONORS &amp; BADGES</span>
+            <div className="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900/60 px-2.5 py-0.5 text-xs text-zinc-400">
+              <Award className="h-3.5 w-3.5 text-indigo-400" />
+              <span>Verified Competencies</span>
             </div>
-            <h1 className="mt-2 text-3xl font-extrabold sm:text-4xl">
-              Trophy Vault
+            <h1 className="mt-2.5 text-2xl font-bold tracking-tight text-white sm:text-3xl">
+              Certifications &amp; Milestones
             </h1>
+            <p className="mt-1 text-xs text-zinc-400">
+              Milestone badges awarded for unassisted solutions, complexity optimizations, and streak discipline.
+            </p>
           </div>
-          <div className="flex items-center gap-3 font-mono text-xs">
-            <span className="text-slate-400">VAULT COMPLETION:</span>
-            <span className="rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-1 font-bold text-amber-300">
-              {unlockedCount} / {achievements.length} UNLOCKED
-            </span>
+
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 px-4 py-2 text-xs font-mono text-zinc-300">
+            <span className="text-indigo-400 font-bold">{unlockedCount}</span> of {achievements.length} Certifications Earned
           </div>
         </div>
 
-        {/* Achievements Grid */}
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {achievements.map((ach) => (
+        {/* Badges Grid */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {achievements.map((item) => (
             <div
-              key={ach.id}
-              className={`relative flex flex-col justify-between rounded-3xl border p-6 transition-all ${
-                ach.unlocked
-                  ? "border-amber-500/40 bg-gradient-to-b from-slate-900 via-slate-900 to-amber-950/10 shadow-lg shadow-amber-950/20"
-                  : "border-slate-800/60 bg-slate-950/40 opacity-50"
+              key={item.id}
+              className={`flex flex-col justify-between rounded-2xl border p-5 transition ${
+                item.unlocked
+                  ? "border-zinc-800 bg-zinc-900/60 hover:border-zinc-700 hover:bg-zinc-900"
+                  : "border-zinc-800/40 bg-zinc-950/40 opacity-60"
               }`}
             >
               <div>
-                <div className="flex items-start justify-between gap-2">
-                  <div className={`flex h-14 w-14 items-center justify-center rounded-2xl border ${
-                    ach.unlocked
-                      ? "border-amber-500/40 bg-amber-950/30 shadow-inner"
-                      : "border-slate-800 bg-slate-900"
+                <div className="flex items-center justify-between">
+                  <div className={`flex h-9 w-9 items-center justify-center rounded-xl border ${
+                    item.unlocked ? "border-indigo-500/30 bg-indigo-600/10" : "border-zinc-800 bg-zinc-950"
                   }`}>
-                    {getIcon(ach.icon, ach.unlocked)}
+                    {getIcon(item.icon, item.unlocked)}
                   </div>
-                  <span className={`rounded-full border px-2.5 py-0.5 font-mono text-[10px] font-bold ${getRarityBadge(ach.rarity)}`}>
-                    {ach.rarity}
-                  </span>
+                  {item.unlocked ? (
+                    <span className="flex items-center gap-1 font-mono text-[11px] font-semibold text-emerald-400">
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      <span>Certified</span>
+                    </span>
+                  ) : (
+                    <Lock className="h-3.5 w-3.5 text-zinc-600" />
+                  )}
                 </div>
 
-                <h3 className="mt-4 text-lg font-bold text-slate-100">
-                  {ach.title}
+                <h3 className="mt-3.5 text-sm font-semibold text-white">
+                  {item.title}
                 </h3>
-                <p className="mt-1 text-xs leading-relaxed text-slate-400">
-                  {ach.description}
+                <p className="mt-1 text-xs text-zinc-400 leading-relaxed">
+                  {item.description}
                 </p>
               </div>
 
-              <div className="mt-6 flex items-center justify-between border-t border-slate-800/80 pt-4 font-mono text-xs">
-                <span className="text-cyan-400">+{ach.xpReward} XP</span>
-                {ach.unlocked ? (
-                  <span className="flex items-center gap-1 font-bold text-emerald-400">
-                    <CheckCircle2 className="h-3.5 w-3.5" />
-                    <span>CLAIMED</span>
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-1 text-slate-600">
-                    <Lock className="h-3.5 w-3.5" />
-                    <span>LOCKED</span>
-                  </span>
-                )}
+              <div className="mt-4 pt-3 border-t border-zinc-800/80 flex items-center justify-between font-mono text-[11px] text-zinc-500">
+                <span>Reward</span>
+                <span className="text-indigo-400 font-bold">+{item.xpReward} XP</span>
               </div>
             </div>
           ))}

@@ -8,15 +8,16 @@ import {
   ArrowLeft,
   Play,
   Send,
-  Zap,
   Clock,
   HardDrive,
   CheckCircle2,
   XCircle,
   AlertCircle,
-  BookOpen,
   Terminal,
-  Bot
+  Bot,
+  Sparkles,
+  Check,
+  ChevronRight
 } from "lucide-react";
 import { GameNav } from "@/components/game-nav";
 import { AiMentorCard } from "@/components/ai-mentor-card";
@@ -33,8 +34,8 @@ import type {
 const Editor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
   loading: () => (
-    <div className="grid h-[440px] place-items-center bg-slate-950 font-mono text-xs text-slate-500">
-      BOOTING QUANTUM MONACO BUFFER...
+    <div className="grid h-[440px] place-items-center bg-zinc-950 font-mono text-xs text-zinc-500">
+      Loading Monaco Code Editor...
     </div>
   )
 });
@@ -64,13 +65,13 @@ export default function MissionPage() {
         setMission(m);
         setCode(m.starterCode);
       })
-      .catch(() => setError("Mission coordinates not found."))
+      .catch(() => setError("Lesson details could not be loaded."))
       .finally(() => setLoading(false));
   }, [id, router]);
 
   const handleExecute = async (mode: "run" | "submit") => {
     if (!code.trim()) {
-      setError("Source buffer empty. Write Java code before deploying.");
+      setError("Please write some Java code before running.");
       sound.playError();
       return;
     }
@@ -94,41 +95,35 @@ export default function MissionPage() {
         sound.playError();
       }
     } catch {
-      setError("Execution pipeline failure. Verify compiler logic or retry.");
+      setError("Execution error. Check syntax and compiler output.");
       sound.playError();
     } finally {
       setBusy(null);
     }
   };
 
-  const handleHintRevealed = (_hint: string, tier: number) => {
-    setHintsUsed(tier);
-  };
-
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 text-slate-100">
+      <div className="min-h-screen bg-zinc-950 text-zinc-100">
         <GameNav />
-        <main className="grid min-h-[70vh] place-items-center font-mono text-sm text-cyan-400">
+        <main className="grid min-h-[70vh] place-items-center text-xs text-zinc-400">
           <div className="flex items-center gap-3">
-            <Bot className="h-5 w-5 animate-spin" />
-            <span>DOWNLOADING MISSION BRIEFING...</span>
+            <Bot className="h-4 w-4 animate-spin text-indigo-400" />
+            <span>Loading lesson environment...</span>
           </div>
         </main>
       </div>
     );
   }
 
-  if (error && !mission) {
+  if (!mission) {
     return (
-      <div className="min-h-screen bg-slate-950 text-slate-100">
+      <div className="min-h-screen bg-zinc-950 text-zinc-100">
         <GameNav />
-        <main className="mx-auto max-w-lg px-6 py-20 text-center">
-          <AlertCircle className="mx-auto h-12 w-12 text-rose-400" />
-          <h2 className="mt-4 text-xl font-bold">Mission Offline</h2>
-          <p className="mt-2 text-sm text-slate-400">{error}</p>
-          <Link href="/world" className="mt-6 inline-block rounded-xl bg-slate-800 px-6 py-2.5 text-sm font-semibold">
-            Return to Sector Map
+        <main className="mx-auto max-w-4xl px-6 py-12 text-center text-xs text-zinc-400">
+          <p>{error || "Lesson not found."}</p>
+          <Link href="/world" className="mt-4 inline-block text-indigo-400 hover:underline">
+            Return to Learning Paths
           </Link>
         </main>
       </div>
@@ -136,246 +131,228 @@ export default function MissionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col">
       <GameNav />
 
-      {victory && <VictoryModal result={victory} onClose={() => setVictory(null)} />}
+      {/* Workspace Sub-Header */}
+      <div className="border-b border-zinc-800/80 bg-zinc-950 px-4 py-2.5 sm:px-6">
+        <div className="mx-auto flex max-w-7xl items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Link
+              href="/world"
+              className="flex h-7 w-7 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900/60 text-zinc-400 transition hover:border-zinc-700 hover:text-white"
+              title="Return to Learning Paths"
+            >
+              <ArrowLeft className="h-4 w-4" />
+            </Link>
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-white">{mission.title}</span>
+                <span className="rounded-md border border-zinc-800 bg-zinc-900 px-2 py-0.5 font-mono text-[10px] font-semibold uppercase text-zinc-400">
+                  {mission.difficulty}
+                </span>
+              </div>
+            </div>
+          </div>
 
-      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-        {/* Navigation Breadcrumb */}
-        <div className="mb-4 flex items-center justify-between">
-          <Link
-            href="/world"
-            onClick={() => sound.playClick()}
-            className="flex items-center gap-2 font-mono text-xs text-slate-400 transition hover:text-cyan-400"
-          >
-            <ArrowLeft className="h-3.5 w-3.5" />
-            <span>RETURN TO SECTOR MAP</span>
-          </Link>
-
-          <div className="flex items-center gap-2">
-            <span className="font-mono text-xs text-slate-500">SECTOR OBJECTIVE</span>
-            <span className="rounded-md border border-cyan-500/30 bg-cyan-500/10 px-2 py-0.5 font-mono text-xs font-bold text-cyan-300 uppercase">
-              NODE 0{mission?.order} // {mission?.difficulty}
-            </span>
+          <div className="flex items-center gap-3 text-xs text-zinc-400">
+            <div className="hidden sm:flex items-center gap-3">
+              <span className="flex items-center gap-1">
+                <Clock className="h-3.5 w-3.5 text-zinc-500" />
+                <span>Target: <code className="text-zinc-200">{mission.expectedTimeComplexity || "O(N)"}</code></span>
+              </span>
+              <span className="flex items-center gap-1">
+                <HardDrive className="h-3.5 w-3.5 text-zinc-500" />
+                <span>Space: <code className="text-zinc-200">{mission.expectedSpaceComplexity || "O(N)"}</code></span>
+              </span>
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* 2-Column Tactical Grid */}
-        <div className="grid gap-6 lg:grid-cols-[1.05fr_1.35fr]">
-          {/* Left Column: Briefing + AI Mentor */}
-          <div className="space-y-6">
-            {/* Mission Story & Objective Card */}
-            <article className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 shadow-xl backdrop-blur-md">
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h1 className="text-2xl font-black text-slate-100 sm:text-3xl">
-                    {mission?.title}
-                  </h1>
-                  <p className="mt-2 text-xs leading-relaxed text-slate-300">
-                    {mission?.story}
-                  </p>
-                </div>
-              </div>
-
-              {/* Tactical Objective */}
-              <div className="mt-5 rounded-xl border border-cyan-500/20 bg-slate-950/60 p-4">
-                <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-cyan-400">
-                  TACTICAL OBJECTIVE
+      {/* Split Workspace Layout */}
+      <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-4 p-4 lg:grid lg:grid-cols-12 lg:gap-6 sm:px-6">
+        {/* Left Pane: Problem Context, Ground Truths & AI Coach (5 cols) */}
+        <div className="space-y-4 lg:col-span-5 flex flex-col">
+          {/* Problem Statement Card */}
+          <section className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 backdrop-blur-md">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+              Problem Context
+            </h2>
+            <div className="mt-3 space-y-3 text-xs leading-relaxed text-zinc-300">
+              <p>{mission.story || mission.objective}</p>
+              <div className="rounded-xl border border-zinc-800/80 bg-zinc-950/60 p-3">
+                <span className="font-semibold text-zinc-200 text-[11px] uppercase tracking-wider block mb-1">
+                  Core Objective:
                 </span>
-                <p className="mt-1 text-xs leading-relaxed text-slate-200">
-                  {mission?.objective}
-                </p>
+                <p className="text-zinc-400">{mission.objective}</p>
               </div>
+            </div>
 
-              {/* Complexity Target HUD */}
-              <div className="mt-4 grid grid-cols-2 gap-3 font-mono text-xs">
-                <div className="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-950/40 p-2.5">
-                  <Clock className="h-4 w-4 text-cyan-400" />
-                  <div>
-                    <span className="block text-[10px] text-slate-500">MAX TIME</span>
-                    <span className="font-bold text-slate-200">{mission?.expectedTimeComplexity}</span>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 rounded-lg border border-slate-800 bg-slate-950/40 p-2.5">
-                  <HardDrive className="h-4 w-4 text-indigo-400" />
-                  <div>
-                    <span className="block text-[10px] text-slate-500">MAX SPACE</span>
-                    <span className="font-bold text-slate-200">{mission?.expectedSpaceComplexity}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Examples */}
-              <div className="mt-6 space-y-3">
-                <span className="font-mono text-xs font-bold uppercase tracking-wider text-slate-400">
-                  Telemetry Ground Truths
+            {/* Test Cases / Examples */}
+            {mission.sampleTestCases && mission.sampleTestCases.length > 0 && (
+              <div className="mt-4 pt-3 border-t border-zinc-800/80">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400 block mb-2">
+                  Sample Test Cases
                 </span>
-                {mission?.examples.map((ex, idx) => (
-                  <div key={idx} className="rounded-xl border border-slate-800/80 bg-slate-950/70 p-3.5 font-mono text-xs">
-                    <div className="text-slate-400">
-                      <span className="text-slate-500">IN: </span>
-                      <span className="text-slate-200">{ex.input}</span>
+                <div className="space-y-2">
+                  {mission.sampleTestCases.slice(0, 2).map((tc, idx) => (
+                    <div key={idx} className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-2.5 font-mono text-[11px] text-zinc-300">
+                      <div><span className="text-zinc-500">Input: </span>{tc.input}</div>
+                      <div><span className="text-zinc-500">Expected: </span><span className="text-emerald-400">{tc.expectedOutput}</span></div>
                     </div>
-                    <div className="mt-1 text-slate-400">
-                      <span className="text-slate-500">OUT: </span>
-                      <span className="text-emerald-300">{ex.output}</span>
-                    </div>
-                    {ex.explanation && (
-                      <p className="mt-1.5 text-[11px] text-slate-500 font-sans">{ex.explanation}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              {/* Constraints */}
-              {mission?.constraints && mission.constraints.length > 0 && (
-                <div className="mt-5">
-                  <span className="font-mono text-[11px] font-bold uppercase tracking-wider text-slate-500">
-                    CONSTRAINTS
-                  </span>
-                  <ul className="mt-1 list-inside list-disc space-y-0.5 text-xs text-slate-400">
-                    {mission.constraints.map((c, i) => (
-                      <li key={i}>{c}</li>
-                    ))}
-                  </ul>
+                  ))}
                 </div>
-              )}
-            </article>
+              </div>
+            )}
+          </section>
 
-            {/* AI Mentor NPC */}
+          {/* AI Diagnosis & Mentor Coach Card */}
+          <section className="flex-1">
             <AiMentorCard
               feedback={feedback}
               missionId={id}
-              totalHintsAvailable={mission?.totalHintsAvailable || 3}
-              onHintRevealed={handleHintRevealed}
+              totalHintsAvailable={mission.totalHintsAvailable || 3}
               hintsUsed={hintsUsed}
+              onHintRevealed={(h, tier) => setHintsUsed(tier)}
             />
-          </div>
+          </section>
+        </div>
 
-          {/* Right Column: Code Editor + Telemetry Panel */}
-          <div className="space-y-4">
-            {/* Monaco Editor Terminal Container */}
-            <div className="overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 shadow-2xl">
-              {/* Header Tab */}
-              <div className="flex items-center justify-between border-b border-slate-800 bg-slate-900/80 px-4 py-2.5 text-xs">
-                <div className="flex items-center gap-2">
-                  <Terminal className="h-4 w-4 text-cyan-400" />
-                  <span className="font-mono font-bold text-slate-200">Main.java</span>
-                  <span className="text-slate-500">• Java 21 Sandbox</span>
-                </div>
-                <span className="font-mono text-[10px] text-slate-500">MONACO ACTIVE</span>
+        {/* Right Pane: Code Editor & Execution Output (7 cols) */}
+        <div className="flex flex-col gap-4 lg:col-span-7">
+          {/* Monaco Editor Container */}
+          <section className="flex flex-1 flex-col overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 shadow-sm">
+            {/* Editor Action Bar */}
+            <div className="flex items-center justify-between border-b border-zinc-800 bg-zinc-900/80 px-4 py-2 text-xs">
+              <div className="flex items-center gap-2">
+                <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
+                <span className="font-mono text-zinc-300 font-semibold">Solution.java</span>
+                <span className="text-zinc-500 text-[11px]">· JDK 21 Sandbox</span>
               </div>
 
-              {/* Editor */}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setCode(mission.starterCode)}
+                  className="rounded-lg px-2.5 py-1 text-[11px] text-zinc-400 transition hover:bg-zinc-800 hover:text-zinc-200"
+                  title="Reset to starter code template"
+                >
+                  Reset
+                </button>
+
+                <button
+                  onClick={() => handleExecute("run")}
+                  disabled={busy !== null}
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-700 bg-zinc-800 px-3 py-1 text-xs font-medium text-zinc-200 transition hover:border-zinc-600 hover:bg-zinc-700 disabled:opacity-50"
+                >
+                  <Play className="h-3 w-3 text-indigo-400" />
+                  <span>{busy === "run" ? "Running..." : "Run Tests"}</span>
+                </button>
+
+                <button
+                  onClick={() => handleExecute("submit")}
+                  disabled={busy !== null}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3.5 py-1 text-xs font-medium text-white shadow-sm shadow-indigo-600/20 transition hover:bg-indigo-500 disabled:opacity-50"
+                >
+                  <Send className="h-3 w-3" />
+                  <span>{busy === "submit" ? "Analyzing..." : "Submit & Analyze"}</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Monaco Editor */}
+            <div className="flex-1 min-h-[380px]">
               <Editor
-                height="450px"
+                height="100%"
+                language="java"
                 theme="vs-dark"
-                defaultLanguage="java"
                 value={code}
-                onChange={(val) => setCode(val ?? "")}
+                onChange={(v) => setCode(v || "")}
                 options={{
                   fontSize: 13,
                   lineNumbers: "on",
                   minimap: { enabled: false },
                   scrollBeyondLastLine: false,
                   automaticLayout: true,
-                  tabSize: 4,
-                  padding: { top: 12, bottom: 12 }
+                  tabSize: 4
                 }}
               />
             </div>
+          </section>
 
-            {/* Control Buttons */}
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex gap-2">
-                <button
-                  disabled={!!busy}
-                  onClick={() => handleExecute("run")}
-                  className="flex items-center gap-2 rounded-xl border border-slate-700 bg-slate-900 px-5 py-2.5 font-mono text-xs font-bold text-slate-200 shadow-sm transition hover:border-slate-500 hover:bg-slate-800 disabled:opacity-50"
-                >
-                  <Play className="h-3.5 w-3.5 fill-current text-cyan-400" />
-                  <span>{busy === "run" ? "RUNNING..." : "RUN DIAGNOSTICS"}</span>
-                </button>
-
-                <button
-                  disabled={!!busy}
-                  onClick={() => handleExecute("submit")}
-                  className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-400 to-indigo-500 px-6 py-2.5 font-mono text-xs font-bold text-slate-950 shadow-lg shadow-cyan-500/20 transition hover:opacity-90 disabled:opacity-50"
-                >
-                  <Send className="h-3.5 w-3.5" />
-                  <span>{busy === "submit" ? "SUBMITTING..." : "SUBMIT TELEMETRY"}</span>
-                </button>
-              </div>
-
-              <span className="font-mono text-xs text-slate-500">
-                Reward: <span className="font-bold text-cyan-400">+{mission?.xpReward} XP</span>
-              </span>
-            </div>
-
-            {error && (
-              <div className="rounded-xl border border-rose-500/30 bg-rose-950/20 p-4 text-xs text-rose-300">
-                {error}
-              </div>
-            )}
-
-            {/* Test Case Execution Telemetry Results */}
-            {result && (
-              <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5 shadow-xl backdrop-blur-md">
-                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                  <div className="flex items-center gap-2">
-                    {result.passed ? (
-                      <CheckCircle2 className="h-5 w-5 text-emerald-400" />
-                    ) : (
-                      <XCircle className="h-5 w-5 text-rose-400" />
-                    )}
-                    <span className={`font-mono text-sm font-bold ${result.passed ? "text-emerald-300" : "text-rose-300"}`}>
-                      {result.status}
-                    </span>
-                  </div>
-                  <span className="font-mono text-xs text-slate-400">
-                    {result.testCasesPassed} / {result.totalTestCases} Tests Passed • {result.executionTime}ms
-                  </span>
+          {/* Execution Telemetry / Terminal Drawer */}
+          {result && (
+            <section className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4 text-xs font-mono">
+              <div className="flex items-center justify-between border-b border-zinc-800 pb-2 mb-3">
+                <div className="flex items-center gap-2">
+                  <Terminal className="h-3.5 w-3.5 text-zinc-400" />
+                  <span className="font-semibold text-zinc-300">Execution Telemetry</span>
                 </div>
+                <div className="flex items-center gap-3">
+                  <span className={result.passed ? "text-emerald-400 font-bold" : "text-rose-400 font-bold"}>
+                    {result.passed ? "✓ ALL TESTS PASSED" : "✗ TEST SUITE FAILED"}
+                  </span>
+                  {result.executionTime !== undefined && (
+                    <span className="text-zinc-500">{result.executionTime}ms</span>
+                  )}
+                </div>
+              </div>
 
-                {/* Individual Test Cases */}
-                <div className="mt-3 space-y-2">
-                  {result.testCaseResults.map((tc) => (
+              {/* Stdout Output */}
+              {result.output && (
+                <div className="mb-2">
+                  <span className="text-zinc-500 text-[11px] block">Standard Output:</span>
+                  <pre className="mt-1 rounded-lg bg-zinc-900/60 p-2 text-zinc-300 whitespace-pre-wrap">
+                    {result.output}
+                  </pre>
+                </div>
+              )}
+
+              {/* Test Cases Results */}
+              {result.testCaseResults && result.testCaseResults.length > 0 && (
+                <div className="space-y-1.5">
+                  {result.testCaseResults.map((tc, idx) => (
                     <div
-                      key={tc.number}
-                      className={`flex items-center justify-between rounded-lg border p-3 font-mono text-xs ${
-                        tc.passed
-                          ? "border-emerald-500/20 bg-emerald-950/10 text-emerald-200"
-                          : "border-rose-500/20 bg-rose-950/10 text-rose-200"
+                      key={idx}
+                      className={`flex items-center justify-between rounded-lg p-2 text-[11px] ${
+                        tc.passed ? "bg-emerald-950/20 text-emerald-300 border border-emerald-500/20" : "bg-rose-950/20 text-rose-300 border border-rose-500/20"
                       }`}
                     >
                       <div className="flex items-center gap-2">
-                        {tc.passed ? (
-                          <CheckCircle2 className="h-4 w-4 text-emerald-400" />
-                        ) : (
-                          <XCircle className="h-4 w-4 text-rose-400" />
-                        )}
-                        <span>Test Case #{tc.number}</span>
+                        {tc.passed ? <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" /> : <XCircle className="h-3.5 w-3.5 text-rose-400" />}
+                        <span>Case {tc.number || idx + 1}: {tc.status}</span>
                       </div>
-                      <span className="text-[11px] opacity-80">{tc.status}</span>
+                      <div>
+                        {tc.passed ? (
+                          <span className="text-emerald-400 font-semibold">Passed</span>
+                        ) : (
+                          <span>Output: <code className="text-rose-300">{tc.output}</code></span>
+                        )}
+                      </div>
                     </div>
                   ))}
                 </div>
+              )}
+            </section>
+          )}
 
-                {/* Terminal Standard Output / Error Stream */}
-                {result.output && (
-                  <div className="mt-4">
-                    <span className="font-mono text-[10px] uppercase text-slate-500">Output Stream</span>
-                    <pre className="mt-1 max-h-36 overflow-auto rounded-lg bg-slate-950 p-3 font-mono text-xs text-slate-300">
-                      {result.output}
-                    </pre>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+          {error && (
+            <div className="flex items-center gap-2 rounded-xl border border-rose-500/30 bg-rose-950/20 p-3 text-xs text-rose-300">
+              <AlertCircle className="h-4 w-4 shrink-0 text-rose-400" />
+              <span>{error}</span>
+            </div>
+          )}
         </div>
       </main>
+
+      {/* Victory Celebration Modal */}
+      {victory && (
+        <VictoryModal
+          result={victory}
+          onClose={() => setVictory(null)}
+          onNextMission={() => router.push("/world")}
+        />
+      )}
     </div>
   );
 }
