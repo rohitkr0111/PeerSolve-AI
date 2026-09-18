@@ -1,6 +1,63 @@
 @import "tailwindcss";
 @config "../tailwind.config.ts";
 
-@layer base { body { @apply bg-slate-950 text-slate-100 antialiased; } input { @apply w-full rounded-lg border border-slate-700 bg-slate-900 px-3 py-2.5 text-sm outline-none focus:border-cyan-400; } }
-@utility btn { @apply inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-semibold transition; }
-@layer components { .btn-primary { @apply btn bg-cyan-400 text-slate-950 hover:bg-cyan-300; } .btn-secondary { @apply btn border border-slate-700 hover:border-slate-500 hover:bg-slate-900; } .card { @apply rounded-2xl border border-slate-800 bg-slate-900/50; } }
+:root {
+  --ink: #121212;
+  --paper: #f5f3ee;
+  --muted: #706f6a;
+  --line: rgba(18, 18, 18, 0.12);
+  --lime: #c9f36a;
+  --coral: #ff765f;
+}
+
+@layer base {
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    @apply antialiased;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  ::selection { background: var(--lime); color: var(--ink); }
+  input {
+    @apply w-full rounded-xl px-4 py-3 text-sm outline-none transition;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,.72);
+    color: var(--ink);
+  }
+  input::placeholder { color: #96948e; }
+  input:focus { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(201,243,106,.55); }
+}
+
+@utility btn { @apply inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-bold transition; }
+
+@layer components {
+  .btn-primary { @apply btn; background: var(--ink); color: white; }
+  .btn-primary:hover { transform: translateY(-1px); background: #2e2e2e; }
+  .btn-secondary { @apply btn; border: 1px solid var(--line); background: transparent; color: var(--ink); }
+  .btn-secondary:hover { background: rgba(18,18,18,.06); }
+  .card { border: 1px solid var(--line); border-radius: 24px; background: rgba(255,255,255,.52); }
+  .eyebrow { @apply text-xs font-bold uppercase tracking-[.18em]; color: var(--muted); }
+}
+
+.noise {
+  background-image: radial-gradient(rgba(18,18,18,.07) .7px, transparent .7px);
+  background-size: 7px 7px;
+}
+
+/* Product surfaces stay warm and editorial across the existing game views. */
+[class~="bg-slate-950"] { background-color: var(--paper) !important; }
+[class~="bg-slate-900"] { background-color: rgba(255,255,255,.62) !important; }
+[class~="bg-slate-900/40"], [class~="bg-slate-900/50"], [class~="bg-slate-900/60"],
+[class~="bg-slate-950/40"], [class~="bg-slate-950/60"] { background-color: rgba(255,255,255,.48) !important; }
+[class~="text-slate-100"], [class~="text-slate-200"] { color: var(--ink) !important; }
+[class~="text-slate-300"], [class~="text-slate-400"], [class~="text-slate-500"] { color: var(--muted) !important; }
+[class~="border-slate-800"], [class~="border-slate-800/80"], [class~="border-slate-700"],
+[class~="border-slate-900"] { border-color: var(--line) !important; }
+[class~="bg-cyan-500/10"], [class~="bg-cyan-500/20"] { background-color: rgba(201,243,106,.22) !important; }
+[class~="text-cyan-300"], [class~="text-cyan-400"] { color: #56820c !important; }
+[class~="border-cyan-500/30"], [class~="border-cyan-500/40"] { border-color: rgba(86,130,12,.3) !important; }
+[class~="bg-gradient-to-r"] { background-image: linear-gradient(90deg, var(--lime), #e9f8b8) !important; }
+[class~="bg-gradient-to-b"] { background-image: linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,.35)) !important; }
+[class~="shadow-cyan-500/20"], [class~="shadow-cyan-950/30"] { box-shadow: 0 18px 45px rgba(18,18,18,.08) !important; }

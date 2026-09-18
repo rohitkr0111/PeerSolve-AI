@@ -64,21 +64,16 @@ export function GameNav() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-800/80 bg-slate-950/85 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-black/10 bg-[#f5f3ee]/90 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
         {/* Brand */}
         <div className="flex items-center gap-3">
           <Link
             href="/world"
             onClick={() => sound.playClick()}
-            className="flex items-center gap-2 text-xl font-extrabold tracking-wider"
+            className="flex items-center gap-2 text-xl font-black tracking-[-.06em]"
           >
-            <span className="bg-gradient-to-r from-cyan-400 via-teal-300 to-indigo-400 bg-clip-text text-transparent">
-              PEERSOLVE
-            </span>
-            <span className="rounded border border-cyan-500/30 bg-cyan-500/10 px-1.5 py-0.5 font-mono text-[10px] font-bold text-cyan-400">
-              RPG
-            </span>
+            <span>peer<span className="text-[#ff765f]">solve</span><span className="ml-1 inline-block h-2 w-2 rounded-full bg-[#c9f36a]" /></span>
           </Link>
         </div>
 
@@ -94,11 +89,11 @@ export function GameNav() {
                 onClick={() => sound.playClick()}
                 className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold tracking-wide transition-all ${
                   active
-                    ? "border border-cyan-500/30 bg-cyan-500/10 text-cyan-300 shadow-sm shadow-cyan-500/20"
-                    : "text-slate-400 hover:border-slate-800 hover:bg-slate-900/80 hover:text-slate-200"
+                    ? "bg-[#121212] text-white"
+                    : "text-[#706f6a] hover:bg-black/5 hover:text-[#121212]"
                 }`}
               >
-                <Icon className={`h-3.5 w-3.5 ${active ? "text-cyan-400" : "text-slate-400"}`} />
+                <Icon className={`h-3.5 w-3.5 ${active ? "text-[#c9f36a]" : "text-[#706f6a]"}`} />
                 {item.label}
               </Link>
             );
@@ -151,7 +146,7 @@ export function GameNav() {
           <button
             onClick={toggleSound}
             aria-label="Toggle Sound"
-            className="rounded-lg border border-slate-800 bg-slate-900/60 p-2 text-slate-400 transition hover:border-slate-700 hover:text-slate-200"
+            className="rounded-lg border border-black/10 bg-white/50 p-2 text-[#706f6a] transition hover:border-black/20 hover:text-[#121212]"
           >
             {muted ? <VolumeX className="h-4 w-4 text-slate-500" /> : <Volume2 className="h-4 w-4 text-cyan-400" />}
           </button>
@@ -160,7 +155,7 @@ export function GameNav() {
           <Link
             href="/dashboard"
             onClick={() => sound.playClick()}
-            className="hidden rounded-lg border border-slate-800 bg-slate-900/60 p-2 text-slate-400 transition hover:border-cyan-500/30 hover:text-cyan-300 sm:flex"
+            className="hidden rounded-lg border border-black/10 bg-white/50 p-2 text-[#706f6a] transition hover:border-black/20 hover:text-[#121212] sm:flex"
             title="Player Command Center"
           >
             <UserIcon className="h-4 w-4" />
@@ -168,7 +163,7 @@ export function GameNav() {
 
           <button
             onClick={handleLogout}
-            className="hidden rounded-lg border border-rose-900/40 bg-rose-950/20 p-2 text-rose-400 transition hover:bg-rose-900/30 sm:flex"
+            className="hidden rounded-lg border border-[#ff765f]/30 bg-[#ff765f]/10 p-2 text-[#d94d3b] transition hover:bg-[#ff765f]/20 sm:flex"
             title="Logout"
           >
             <LogOut className="h-4 w-4" />
