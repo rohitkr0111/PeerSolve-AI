@@ -1,147 +1,63 @@
 @import "tailwindcss";
+@config "../tailwind.config.ts";
 
 :root {
-  --background: #09090b;
-  --foreground: #fafafa;
+  --ink: #121212;
+  --paper: #f5f3ee;
+  --muted: #706f6a;
+  --line: rgba(18, 18, 18, 0.12);
+  --lime: #c9f36a;
+  --coral: #ff765f;
 }
 
-body {
-  background-color: #09090b;
-  color: #f4f4f5;
-  font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
+@layer base {
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    @apply antialiased;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: Arial, Helvetica, sans-serif;
+  }
+  ::selection { background: var(--lime); color: var(--ink); }
+  input {
+    @apply w-full rounded-xl px-4 py-3 text-sm outline-none transition;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,.72);
+    color: var(--ink);
+  }
+  input::placeholder { color: #96948e; }
+  input:focus { border-color: var(--ink); box-shadow: 0 0 0 3px rgba(201,243,106,.55); }
 }
 
-input, textarea, select {
-  width: 100%;
-  border-radius: 0.75rem;
-  border: 1px solid #27272a;
-  background-color: rgba(24, 24, 27, 0.9);
-  padding: 0.625rem 0.875rem;
-  font-size: 0.875rem;
-  color: #f4f4f5;
-  outline: none;
-  transition: all 150ms ease;
+@utility btn { @apply inline-flex items-center justify-center rounded-full px-5 py-3 text-sm font-bold transition; }
+
+@layer components {
+  .btn-primary { @apply btn; background: var(--ink); color: white; }
+  .btn-primary:hover { transform: translateY(-1px); background: #2e2e2e; }
+  .btn-secondary { @apply btn; border: 1px solid var(--line); background: transparent; color: var(--ink); }
+  .btn-secondary:hover { background: rgba(18,18,18,.06); }
+  .card { border: 1px solid var(--line); border-radius: 24px; background: rgba(255,255,255,.52); }
+  .eyebrow { @apply text-xs font-bold uppercase tracking-[.18em]; color: var(--muted); }
 }
 
-input:focus, textarea:focus, select:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 1px #6366f1;
+.noise {
+  background-image: radial-gradient(rgba(18,18,18,.07) .7px, transparent .7px);
+  background-size: 7px 7px;
 }
 
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.75rem;
-  padding: 0.5rem 1rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  transition: all 150ms ease;
-}
-
-.btn:active {
-  transform: scale(0.98);
-}
-
-.btn:disabled {
-  pointer-events: none;
-  opacity: 0.5;
-}
-
-.btn-primary {
-  background-color: #4f46e5;
-  color: #ffffff;
-  box-shadow: 0 1px 2px 0 rgba(79, 70, 229, 0.2);
-}
-
-.btn-primary:hover {
-  background-color: #6366f1;
-}
-
-.btn-secondary {
-  border: 1px solid #27272a;
-  background-color: rgba(24, 24, 27, 0.8);
-  color: #e4e4e7;
-}
-
-.btn-secondary:hover {
-  border-color: #3f3f46;
-  background-color: #27272a;
-  color: #ffffff;
-}
-
-.btn-ghost {
-  color: #a1a1aa;
-}
-
-.btn-ghost:hover {
-  background-color: #18181b;
-  color: #e4e4e7;
-}
-
-.card {
-  border-radius: 1rem;
-  border: 1px solid rgba(39, 39, 42, 0.8);
-  background-color: rgba(24, 24, 27, 0.5);
-  backdrop-filter: blur(8px);
-}
-
-.card-hover {
-  border-radius: 1rem;
-  border: 1px solid rgba(39, 39, 42, 0.8);
-  background-color: rgba(24, 24, 27, 0.5);
-  backdrop-filter: blur(8px);
-  transition: all 200ms ease;
-}
-
-.card-hover:hover {
-  transform: translateY(-2px);
-  border-color: #3f3f46;
-  background-color: rgba(24, 24, 27, 0.8);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
-}
-
-.badge-primary {
-  border-radius: 9999px;
-  border: 1px solid rgba(99, 102, 241, 0.3);
-  background-color: rgba(99, 102, 241, 0.1);
-  padding: 0.125rem 0.625rem;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #a5b4fc;
-}
-
-.badge-success {
-  border-radius: 9999px;
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  background-color: rgba(16, 185, 129, 0.1);
-  padding: 0.125rem 0.625rem;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #6ee7b7;
-}
-
-.badge-warning {
-  border-radius: 9999px;
-  border: 1px solid rgba(245, 158, 11, 0.3);
-  background-color: rgba(245, 158, 11, 0.1);
-  padding: 0.125rem 0.625rem;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #fcd34d;
-}
-
-.badge-danger {
-  border-radius: 9999px;
-  border: 1px solid rgba(244, 63, 94, 0.3);
-  background-color: rgba(244, 63, 94, 0.1);
-  padding: 0.125rem 0.625rem;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #fda4af;
-}
+/* Product surfaces stay warm and editorial across the existing game views. */
+[class~="bg-slate-950"] { background-color: var(--paper) !important; }
+[class~="bg-slate-900"] { background-color: rgba(255,255,255,.62) !important; }
+[class~="bg-slate-900/40"], [class~="bg-slate-900/50"], [class~="bg-slate-900/60"],
+[class~="bg-slate-950/40"], [class~="bg-slate-950/60"] { background-color: rgba(255,255,255,.48) !important; }
+[class~="text-slate-100"], [class~="text-slate-200"] { color: var(--ink) !important; }
+[class~="text-slate-300"], [class~="text-slate-400"], [class~="text-slate-500"] { color: var(--muted) !important; }
+[class~="border-slate-800"], [class~="border-slate-800/80"], [class~="border-slate-700"],
+[class~="border-slate-900"] { border-color: var(--line) !important; }
+[class~="bg-cyan-500/10"], [class~="bg-cyan-500/20"] { background-color: rgba(201,243,106,.22) !important; }
+[class~="text-cyan-300"], [class~="text-cyan-400"] { color: #56820c !important; }
+[class~="border-cyan-500/30"], [class~="border-cyan-500/40"] { border-color: rgba(86,130,12,.3) !important; }
+[class~="bg-gradient-to-r"] { background-image: linear-gradient(90deg, var(--lime), #e9f8b8) !important; }
+[class~="bg-gradient-to-b"] { background-image: linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,.35)) !important; }
+[class~="shadow-cyan-500/20"], [class~="shadow-cyan-950/30"] { box-shadow: 0 18px 45px rgba(18,18,18,.08) !important; }

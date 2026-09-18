@@ -2,23 +2,32 @@
 
 Learn by Solving Together.
 
+PeerSolve is an AI-powered adaptive coding learning platform that analyzes how learners solve problems—not just whether their code is correct. It detects misconceptions, provides targeted guidance, and adapts the next learning step based on their progress.
+
 ## Tech stack
 
-- Frontend: Next.js, TypeScript, Tailwind CSS
+- Frontend: Next.js, TypeScript, Tailwind CSS, Monaco Editor
 - Backend: Java, Spring Boot, Spring Security
 - Database: MongoDB Atlas
 - Authentication: JWT and BCrypt
+- Code Execution: Judge0 with local JDK fallback
+- AI Learning Layer: ADA-7 Mentor and misconception analysis
 
 ## Phase 2 features
 
-- Seeded coding problem library with title/topic/difficulty filters
-- Java solution editor powered by Monaco
-- Isolated Judge0 execution integration
-- Authenticated runs, saved submissions, history, and dashboard progress
+- Adaptive coding practice with topic and difficulty-based problems
+- Java coding workspace powered by Monaco
+- Judge0 execution with local JDK fallback
+- AI-powered solution analysis and misconception detection
+- Progressive hints and targeted micro-challenges
+- Adaptive next-problem recommendations
+- Topic-wise mastery and learning progress
+- Multi-stage Mastery Challenges: Diagnose, Fix, Optimize, Explain
+- Submission history, XP, streaks, and learning achievements
 
 ## Running locally
 
-Copy `.env.example` to `.env` and fill in the MongoDB and JWT values. For the backend, set its environment variables in your terminal.
+Copy `.env.example` to `.env` and configure the MongoDB, JWT, and Judge0 values.
 
 ### Frontend
 
@@ -28,7 +37,7 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:3000.
+Open [http://localhost:3000](http://localhost:3000).
 
 ### Backend
 
@@ -37,25 +46,45 @@ cd backend
 mvn spring-boot:run
 ```
 
-The API starts at http://localhost:8080 and Swagger is at http://localhost:8080/swagger-ui/index.html.
+The API starts at [http://localhost:8082](http://localhost:8082).
 
 ## Environment variables
 
 | Variable | Purpose |
-| --- | --- |
+|---|---|
 | `MONGODB_URI` | MongoDB Atlas connection string |
 | `JWT_SECRET` | Long random signing secret (32+ characters) |
 | `JWT_EXPIRATION` | JWT lifetime in milliseconds; defaults to 86400000 |
-| `NEXT_PUBLIC_API_URL` | Browser-visible backend URL; defaults to http://localhost:8080 |
-| `JUDGE0_URL` | Judge0 `submissions` API URL, e.g. `https://judge0-ce.p.rapidapi.com/submissions` |
-| `JUDGE0_API_KEY` | Judge0 or RapidAPI credential; leave blank only for a self-hosted unauthenticated Judge0 instance |
-| `JUDGE0_API_HOST` | Required by RapidAPI Judge0, e.g. `judge0-ce.p.rapidapi.com` |
+| `NEXT_PUBLIC_API_URL` | Browser-visible backend URL; defaults to `http://localhost:8082` |
+| `JUDGE0_URL` | Judge0 submissions API URL |
+| `JUDGE0_API_KEY` | Judge0 or RapidAPI credential |
+| `JUDGE0_API_HOST` | Required when using RapidAPI Judge0 |
 
 ## API
+
+### Authentication
 
 - `POST /api/auth/register`
 - `POST /api/auth/login`
 - `GET /api/users/me` (Bearer token required)
-- `GET /api/problems` and `GET /api/problems/{id}`
-- `POST /api/submissions/run`, `POST /api/submissions`, and `GET /api/submissions/my` (Bearer token required)
+
+### Coding practice
+
+- `GET /api/problems`
+- `GET /api/problems/{id}`
+- `POST /api/submissions/run`
+- `POST /api/submissions`
+- `GET /api/submissions/my` (Bearer token required)
 - `GET /api/dashboard/stats` (Bearer token required)
+
+### Adaptive learning
+
+- `GET /api/game/profile` (Bearer token required)
+- `GET /api/game/worlds`
+- `GET /api/game/missions/{id}`
+- `POST /api/game/missions/{id}/attempt` (Bearer token required)
+- `POST /api/game/missions/{id}/hint` (Bearer token required)
+- `GET /api/game/adaptive/next` (Bearer token required)
+- `GET /api/game/skill-tree` (Bearer token required)
+- `GET /api/game/leaderboard`
+- `GET /api/game/achievements`

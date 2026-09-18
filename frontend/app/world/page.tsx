@@ -4,22 +4,21 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  Compass,
+  Globe,
   Lock,
   CheckCircle2,
   Play,
-  Target,
+  Skull,
   Bot,
+  Zap,
   ArrowRight,
+  ShieldAlert,
+  Cpu,
   GitFork,
-  Database,
-  Sparkles,
-  Layers,
-  Check,
-  Code2,
-  ChevronRight
+  Database
 } from "lucide-react";
 import { GameNav } from "@/components/game-nav";
+import { Loading } from "@/components/loading";
 import { gameApi } from "@/lib/game-api";
 import { auth } from "@/lib/auth";
 import { sound } from "@/lib/sound";
@@ -46,230 +45,269 @@ export default function WorldMapPage() {
         setWorlds(w);
         setAdaptive(ad);
       })
-      .catch(() => setError("Failed to load curriculum tracks."))
+      .catch(() => setError("Failed to load neural sector maps."))
       .finally(() => setLoading(false));
   }, [router]);
 
-  // Clean professional topic name mapping
-  const getCleanTopicName = (rawName: string, order: number) => {
-    if (order === 1) return "Track 01 · Arrays & Linear Traversal";
-    if (order === 2) return "Track 02 · Searching & Two Pointers";
-    if (order === 3) return "Track 03 · Hash Tables & Frequency Maps";
-    return `Track 0${order} · ${rawName}`;
-  };
-
-  const getCleanTopicDesc = (order: number, desc: string) => {
-    if (order === 1) return "Master continuous memory indexing, in-place swaps, prefix accumulators, and boundary guards.";
-    if (order === 2) return "Learn inward converging pointers, window boundaries, monotonic properties, and logarithmic binary search.";
-    if (order === 3) return "Trade space for constant time O(1) lookups, hash collision strategies, and complement index matching.";
-    return desc;
+  const getSectorIcon = (iconName: string) => {
+    switch (iconName) {
+      case "GitFork":
+        return <GitFork className="h-6 w-6 text-indigo-400" />;
+      case "Database":
+        return <Database className="h-6 w-6 text-emerald-400" />;
+      default:
+        return <Cpu className="h-6 w-6 text-cyan-400" />;
+    }
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-zinc-950 text-zinc-100">
+      <div className="min-h-screen bg-slate-950 text-slate-100">
         <GameNav />
-        <main className="grid min-h-[70vh] place-items-center text-xs text-zinc-400">
-          <div className="flex items-center gap-3">
-            <Bot className="h-4 w-4 animate-spin text-indigo-400" />
-            <span>Loading structured curriculum...</span>
-          </div>
+        <main>
+          <Loading message="CALIBRATING SECTOR TELEMETRY..." />
         </main>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100">
+    <div className="min-h-screen bg-slate-950 text-slate-100">
       <GameNav />
 
       <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-        {/* Header */}
-        <section className="mb-8">
-          <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900/60 px-2.5 py-0.5 text-xs text-zinc-400">
-                <Compass className="h-3.5 w-3.5 text-indigo-400" />
-                <span>Structured Curriculum Map</span>
-              </div>
-              <h1 className="mt-2.5 text-2xl font-bold tracking-tight text-white sm:text-3xl">
-                Learning Paths
-              </h1>
-              <p className="mt-1 text-xs text-zinc-400">
-                Deliberate pedagogical progression: Learn &rarr; Practice &rarr; Apply &rarr; Master.
-              </p>
-            </div>
-
-            {adaptive && (
-              <div className="rounded-xl border border-indigo-500/30 bg-indigo-950/20 px-4 py-2.5 text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-indigo-300">Recommended Next Step:</span>
-                  <span className="font-bold text-white">{adaptive.title}</span>
+        {/* Adaptive AI Target Banner */}
+        {adaptive && (
+          <section className="mb-8 overflow-hidden rounded-2xl border border-cyan-500/30 bg-gradient-to-r from-cyan-950/40 via-slate-900 to-indigo-950/40 p-5 shadow-lg shadow-cyan-950/30 backdrop-blur-md">
+            <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+              <div className="flex items-center gap-3.5">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-cyan-400/40 bg-cyan-500/10 text-cyan-300">
+                  <Bot className="h-6 w-6" />
                 </div>
-                <p className="text-[11px] text-zinc-400 mt-0.5">{adaptive.reason}</p>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono text-xs font-bold tracking-wider text-cyan-400">
+                      ADA-7 TARGET RECOMMENDATION
+                    </span>
+                    <span className="rounded bg-cyan-400/20 px-1.5 py-0.5 font-mono text-[10px] font-bold text-cyan-300 uppercase">
+                      {adaptive.difficulty}
+                    </span>
+                  </div>
+                  <h3 className="text-base font-bold text-slate-100">{adaptive.title}</h3>
+                  <p className="text-xs text-slate-400">{adaptive.reason}</p>
+                </div>
               </div>
-            )}
+
+              {adaptive.missionId && (
+                <Link
+                  href={adaptive.difficulty === "BOSS" ? `/boss/${adaptive.missionId}` : `/missions/${adaptive.missionId}`}
+                  onClick={() => sound.playClick()}
+                  className="flex shrink-0 items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-400 to-indigo-500 px-5 py-2.5 font-mono text-xs font-bold text-slate-950 shadow-md shadow-cyan-500/20 transition hover:opacity-90"
+                >
+                  <span>DEPLOY TARGET</span>
+                  <ArrowRight className="h-3.5 w-3.5" />
+                </Link>
+              )}
+            </div>
+          </section>
+        )}
+
+        {/* Sectors Header */}
+        <div className="mb-8 flex flex-col justify-between gap-2 sm:flex-row sm:items-end">
+          <div>
+            <p className="font-mono text-xs font-bold uppercase tracking-widest text-cyan-400">
+              TACTICAL CAMPAIGN
+            </p>
+            <h1 className="mt-1 text-3xl font-extrabold text-slate-100 sm:text-4xl">
+              Learning Sectors
+            </h1>
           </div>
-        </section>
+          <p className="text-xs text-slate-400">
+            Conquer node challenges in sequence to breach and dismantle sector Boss Guardians.
+          </p>
+        </div>
 
-        {/* Tracks List */}
+        {error && <p className="mb-6 text-sm text-rose-400">{error}</p>}
+
+        {/* Worlds Grid */}
         <div className="space-y-8">
-          {worlds.map((world) => {
-            const isUnlocked = world.unlocked;
-            const completedCount = world.missions.filter((m) => m.completed).length;
-            const totalCount = world.missions.length;
-            const masteryPct = totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
-
-            return (
-              <section
-                key={world.id}
-                className={`overflow-hidden rounded-2xl border transition-all ${
-                  isUnlocked
-                    ? "border-zinc-800 bg-zinc-900/40 hover:border-zinc-700"
-                    : "border-zinc-800/60 bg-zinc-950/40 opacity-70"
-                }`}
-              >
-                {/* Track Header */}
-                <div className="border-b border-zinc-800/80 bg-zinc-900/70 p-5 sm:p-6">
-                  <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+          {worlds.map((world) => (
+            <div
+              key={world.id}
+              className={`relative overflow-hidden rounded-3xl border transition-all ${
+                world.unlocked
+                  ? "border-slate-800 bg-slate-900/40 backdrop-blur-md hover:border-slate-700"
+                  : "border-slate-900 bg-slate-950/60 opacity-65"
+              }`}
+            >
+              {/* World Header */}
+              <div className="border-b border-slate-800/80 p-6 sm:p-8">
+                <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-slate-700 bg-slate-900">
+                      {getSectorIcon(world.badgeIcon)}
+                    </div>
                     <div>
-                      <div className="flex items-center gap-2">
-                        <span className="font-semibold text-xs text-indigo-400">
-                          {getCleanTopicName(world.name, world.order)}
-                        </span>
-                        {!isUnlocked && (
-                          <span className="flex items-center gap-1 rounded-md bg-zinc-800 px-2 py-0.5 text-[10px] font-medium text-zinc-400">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h2 className="text-2xl font-bold text-slate-100">{world.name}</h2>
+                        {!world.unlocked ? (
+                          <span className="flex items-center gap-1 rounded-full border border-slate-700 bg-slate-800/60 px-2.5 py-0.5 font-mono text-xs font-semibold text-slate-400">
                             <Lock className="h-3 w-3" />
-                            <span>Unlocks at Level {world.requiredLevel}</span>
+                            <span>REQ LVL {world.requiredLevel}</span>
+                          </span>
+                        ) : world.bossDefeated ? (
+                          <span className="flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 font-mono text-xs font-semibold text-emerald-400">
+                            <CheckCircle2 className="h-3 w-3" />
+                            <span>SECTOR LIBERATED</span>
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-1 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-2.5 py-0.5 font-mono text-xs font-semibold text-cyan-400">
+                            <span>SECTOR ACTIVE</span>
                           </span>
                         )}
                       </div>
-                      <p className="mt-1 text-xs text-zinc-300 max-w-3xl">
-                        {getCleanTopicDesc(world.order, world.description)}
+                      <p className="mt-1 font-medium text-cyan-400/90">{world.subtitle}</p>
+                      <p className="mt-2 max-w-2xl text-xs leading-relaxed text-slate-400">
+                        {world.description}
                       </p>
                     </div>
+                  </div>
 
-                    <div className="flex items-center gap-4">
-                      <div className="text-right">
-                        <div className="text-xs font-mono font-bold text-white">
-                          {masteryPct}% Mastery
-                        </div>
-                        <div className="text-[11px] text-zinc-500">
-                          {completedCount} of {totalCount} lessons verified
-                        </div>
-                      </div>
-                      <div className="h-2 w-24 overflow-hidden rounded-full bg-zinc-800">
-                        <div
-                          className="h-full bg-indigo-500 rounded-full"
-                          style={{ width: `${masteryPct}%` }}
-                        />
-                      </div>
+                  {/* Progress Ring / Bar */}
+                  <div className="flex flex-col items-end gap-1 font-mono sm:min-w-[160px]">
+                    <div className="flex items-center gap-2 text-xs font-bold text-slate-300">
+                      <span>PROGRESS: {world.progressPercent}%</span>
                     </div>
+                    <div className="h-2 w-full overflow-hidden rounded-full bg-slate-800">
+                      <div
+                        className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-indigo-500 transition-all duration-500"
+                        style={{ width: `${world.progressPercent}%` }}
+                      />
+                    </div>
+                    <span className="text-[11px] text-slate-500">
+                      {world.completedMissionsCount} of {world.totalMissionsCount} Nodes Cleared
+                    </span>
                   </div>
                 </div>
+              </div>
 
-                {/* Lessons & Practice Items */}
-                <div className="p-5 sm:p-6">
-                  <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {world.missions.map((mission) => {
-                      const isMissionAvailable = isUnlocked && mission.unlocked;
-                      return (
-                        <div
-                          key={mission.id}
-                          className={`flex flex-col justify-between rounded-xl border p-4 transition ${
-                            mission.completed
-                              ? "border-emerald-500/30 bg-emerald-950/10"
-                              : isMissionAvailable
-                              ? "border-zinc-800 bg-zinc-900/60 hover:border-zinc-700 hover:bg-zinc-900"
-                              : "border-zinc-800/40 bg-zinc-950/30 opacity-50"
-                          }`}
-                        >
-                          <div>
-                            <div className="flex items-center justify-between">
-                              <span className="font-mono text-[10px] uppercase tracking-wider text-zinc-500">
-                                {mission.difficulty} · {mission.order === 1 ? "Learn" : mission.order === 2 ? "Practice" : "Apply"}
-                              </span>
-                              {mission.completed ? (
-                                <span className="flex items-center gap-1 font-mono text-[11px] font-semibold text-emerald-400">
-                                  <CheckCircle2 className="h-3.5 w-3.5" />
-                                  <span>Mastered</span>
-                                </span>
-                              ) : !isMissionAvailable ? (
-                                <Lock className="h-3.5 w-3.5 text-zinc-600" />
-                              ) : null}
-                            </div>
-
-                            <h4 className="mt-2 text-sm font-semibold text-white">
-                              {mission.title}
-                            </h4>
-                            <p className="mt-1 text-xs text-zinc-400 line-clamp-2 leading-relaxed">
-                              {mission.objective}
-                            </p>
-                          </div>
-
-                          <div className="mt-4 pt-3 border-t border-zinc-800/60 flex items-center justify-between">
-                            <span className="text-[11px] text-zinc-500">
-                              Reward: <span className="font-mono text-zinc-300">+{mission.xpReward} XP</span>
+              {/* Missions & Boss in this Sector */}
+              <div className="p-6 sm:p-8">
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {world.missions.map((mission) => (
+                    <div
+                      key={mission.id}
+                      className={`group relative flex flex-col justify-between rounded-2xl border p-5 transition-all ${
+                        mission.completed
+                          ? "border-emerald-500/30 bg-emerald-950/10 hover:border-emerald-500/50"
+                          : mission.unlocked
+                          ? "border-slate-800 bg-slate-900/60 hover:-translate-y-1 hover:border-cyan-500/40 hover:shadow-lg hover:shadow-cyan-950/20"
+                          : "border-slate-800/40 bg-slate-950/40 opacity-50"
+                      }`}
+                    >
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono text-[11px] font-bold text-slate-500">
+                            NODE 0{mission.order}
+                          </span>
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`rounded-full px-2 py-0.5 font-mono text-[10px] font-bold ${
+                                mission.difficulty === "EASY"
+                                  ? "bg-emerald-500/10 text-emerald-300"
+                                  : mission.difficulty === "MEDIUM"
+                                  ? "bg-amber-500/10 text-amber-300"
+                                  : "bg-rose-500/10 text-rose-300"
+                              }`}
+                            >
+                              {mission.difficulty}
                             </span>
-                            {isMissionAvailable ? (
-                              <Link
-                                href={`/missions/${mission.id}`}
-                                onClick={() => sound.playClick()}
-                                className={`inline-flex items-center gap-1 rounded-lg px-3 py-1 text-xs font-medium transition ${
-                                  mission.completed
-                                    ? "border border-zinc-700 bg-zinc-800 text-zinc-200 hover:bg-zinc-700"
-                                    : "bg-indigo-600 text-white hover:bg-indigo-500"
-                                }`}
-                              >
-                                <span>{mission.completed ? "Review" : "Solve"}</span>
-                                <ChevronRight className="h-3.5 w-3.5" />
-                              </Link>
-                            ) : (
-                              <span className="text-[11px] text-zinc-600">Prerequisite locked</span>
+                            {mission.completed && (
+                              <CheckCircle2 className="h-4 w-4 text-emerald-400" />
                             )}
                           </div>
                         </div>
-                      );
-                    })}
 
-                    {/* Mastery Milestone Gate (Replaced Boss Fight) */}
-                    {world.bossBattleId && (
-                      <div className="flex flex-col justify-between rounded-xl border border-indigo-500/30 bg-indigo-950/20 p-4">
-                        <div>
-                          <div className="flex items-center justify-between">
-                            <span className="rounded-md bg-indigo-500/20 px-2 py-0.5 font-mono text-[10px] font-bold text-indigo-300 uppercase">
-                              Mastery Milestone
-                            </span>
-                            <Target className="h-4 w-4 text-indigo-400" />
-                          </div>
-                          <h4 className="mt-2 text-sm font-bold text-white">
-                            4-Stage Certification Challenge
-                          </h4>
-                          <p className="mt-1 text-xs text-zinc-300 leading-relaxed">
-                            Diagnose, Fix, Optimize, and Explain. Verifies true competence before topic advancement.
-                          </p>
+                        <h3 className="mt-3 text-base font-bold text-slate-100 group-hover:text-cyan-300">
+                          {mission.title}
+                        </h3>
+                        <p className="mt-2 text-xs leading-relaxed text-slate-400">
+                          {mission.objective}
+                        </p>
+                      </div>
+
+                      <div className="mt-5 flex items-center justify-between border-t border-slate-800/80 pt-4 font-mono text-xs">
+                        <span className="text-cyan-400">+{mission.xpReward} XP</span>
+                        {mission.unlocked ? (
+                          <Link
+                            href={`/missions/${mission.id}`}
+                            onClick={() => sound.playClick()}
+                            className="flex items-center gap-1 font-bold text-slate-300 transition-colors group-hover:text-cyan-400"
+                          >
+                            <span>{mission.completed ? "Replay" : "Deploy"}</span>
+                            <Play className="h-3 w-3 fill-current" />
+                          </Link>
+                        ) : (
+                          <span className="flex items-center gap-1 text-slate-600">
+                            <Lock className="h-3 w-3" />
+                            <span>Locked</span>
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Boss Battle Gate Card */}
+                  {world.bossBattleId && (
+                    <div
+                      className={`relative flex flex-col justify-between rounded-2xl border p-5 transition-all ${
+                        world.bossDefeated
+                          ? "border-emerald-500/40 bg-emerald-950/20"
+                          : world.completedMissionsCount >= world.totalMissionsCount && world.totalMissionsCount > 0
+                          ? "border-rose-500/50 bg-gradient-to-br from-rose-950/30 to-slate-900 shadow-xl shadow-rose-950/30 animate-pulse"
+                          : "border-slate-800/50 bg-slate-950/60 opacity-60"
+                      }`}
+                    >
+                      <div>
+                        <div className="flex items-center justify-between">
+                          <span className="font-mono text-[11px] font-bold text-rose-400">
+                            BOSS GUARDIAN
+                          </span>
+                          <Skull className={`h-5 w-5 ${world.bossDefeated ? "text-emerald-400" : "text-rose-400"}`} />
                         </div>
 
-                        <div className="mt-4 pt-3 border-t border-indigo-500/20 flex items-center justify-between">
-                          <span className="text-[11px] text-indigo-300 font-mono">
-                            4 Evaluation Stages
-                          </span>
+                        <h3 className="mt-3 text-base font-bold text-slate-100">
+                          The Chrono-Consumer
+                        </h3>
+                        <p className="mt-2 text-xs text-slate-400">
+                          Multi-Stage Boss Battle. Dismantle its 4 subroutines to liberate the sector.
+                        </p>
+                      </div>
+
+                      <div className="mt-5 flex items-center justify-between border-t border-slate-800/80 pt-4 font-mono text-xs">
+                        <span className="text-amber-400">+500 XP BONUS</span>
+                        {world.completedMissionsCount >= world.totalMissionsCount && world.totalMissionsCount > 0 ? (
                           <Link
                             href={`/boss/${world.bossBattleId}`}
                             onClick={() => sound.playClick()}
-                            className="inline-flex items-center gap-1 rounded-lg bg-indigo-600 px-3 py-1 text-xs font-medium text-white shadow-sm hover:bg-indigo-500"
+                            className="flex items-center gap-1.5 rounded-lg bg-rose-500 px-3 py-1 font-bold text-slate-950 transition hover:bg-rose-400"
                           >
-                            <span>Launch Challenge</span>
-                            <ArrowRight className="h-3.5 w-3.5" />
+                            <Skull className="h-3.5 w-3.5" />
+                            <span>Fight Boss</span>
                           </Link>
-                        </div>
+                        ) : (
+                          <span className="flex items-center gap-1 text-slate-600">
+                            <Lock className="h-3 w-3" />
+                            <span>Clear Nodes</span>
+                          </span>
+                        )}
                       </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
                 </div>
-              </section>
-            );
-          })}
+              </div>
+            </div>
+          ))}
         </div>
       </main>
     </div>
