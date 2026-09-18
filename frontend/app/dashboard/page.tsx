@@ -17,6 +17,7 @@ import {
   Play
 } from "lucide-react";
 import { GameNav } from "@/components/game-nav";
+import { Loading } from "@/components/loading";
 import { gameApi } from "@/lib/game-api";
 import { auth } from "@/lib/auth";
 import { sound } from "@/lib/sound";
@@ -64,8 +65,8 @@ export default function DashboardPage() {
     return (
       <div className="min-h-screen bg-slate-950 text-slate-100">
         <GameNav />
-        <main className="grid min-h-[70vh] place-items-center font-mono text-sm text-cyan-400">
-          INITIALIZING PLAYER COMMAND TELEMETRY...
+        <main>
+          <Loading message="INITIALIZING PLAYER COMMAND TELEMETRY..." />
         </main>
       </div>
     );

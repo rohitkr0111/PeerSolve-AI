@@ -8,9 +8,9 @@ import {
   Skull,
   Zap,
   CheckCircle2,
-  Bot
 } from "lucide-react";
 import { GameNav } from "@/components/game-nav";
+import { Loading } from "@/components/loading";
 import { gameApi } from "@/lib/game-api";
 import type { LeaderboardEntry } from "@/types/game";
 
@@ -33,11 +33,8 @@ export default function LeaderboardPage() {
     return (
       <div className="min-h-screen bg-slate-950 text-slate-100">
         <GameNav />
-        <main className="grid min-h-[70vh] place-items-center font-mono text-sm text-cyan-400">
-          <div className="flex items-center gap-3">
-            <Bot className="h-5 w-5 animate-spin" />
-            <span>AGGREGATING GLOBAL SECTOR LEADERBOARD...</span>
-          </div>
+        <main>
+          <Loading message="AGGREGATING GLOBAL SECTOR LEADERBOARD..." />
         </main>
       </div>
     );

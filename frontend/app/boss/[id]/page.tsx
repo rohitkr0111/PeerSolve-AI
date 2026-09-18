@@ -22,6 +22,7 @@ import {
   Play
 } from "lucide-react";
 import { GameNav } from "@/components/game-nav";
+import { Loading } from "@/components/loading";
 import { gameApi } from "@/lib/game-api";
 import { sound } from "@/lib/sound";
 import { auth } from "@/lib/auth";
@@ -30,9 +31,7 @@ import type { BossBattle, BossStage, BossStageResult } from "@/types/game";
 const Editor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
   loading: () => (
-    <div className="grid h-[340px] place-items-center bg-slate-950 font-mono text-xs text-slate-500">
-      BOOTING QUANTUM MONACO BUFFER...
-    </div>
+    <Loading compact className="h-[340px] bg-slate-950" message="BOOTING QUANTUM MONACO BUFFER..." />
   )
 });
 
@@ -141,6 +140,17 @@ export default function BossBattlePage() {
       setBusy(false);
     }
   };
+
+  if (!boss && !error) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-100">
+        <GameNav />
+        <main>
+          <Loading message="LOADING BOSS ARENA..." />
+        </main>
+      </div>
+    );
+  }
 
   if (error && !boss) {
     return (

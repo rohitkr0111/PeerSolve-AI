@@ -18,6 +18,7 @@ import {
   Database
 } from "lucide-react";
 import { GameNav } from "@/components/game-nav";
+import { Loading } from "@/components/loading";
 import { gameApi } from "@/lib/game-api";
 import { auth } from "@/lib/auth";
 import { sound } from "@/lib/sound";
@@ -63,11 +64,8 @@ export default function WorldMapPage() {
     return (
       <div className="min-h-screen bg-slate-950 text-slate-100">
         <GameNav />
-        <main className="grid min-h-[70vh] place-items-center font-mono text-sm text-cyan-400">
-          <div className="flex items-center gap-3">
-            <Bot className="h-5 w-5 animate-spin" />
-            <span>CALIBRATING SECTOR TELEMETRY...</span>
-          </div>
+        <main>
+          <Loading message="CALIBRATING SECTOR TELEMETRY..." />
         </main>
       </div>
     );

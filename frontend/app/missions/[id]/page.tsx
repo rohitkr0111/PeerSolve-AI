@@ -16,9 +16,9 @@ import {
   AlertCircle,
   BookOpen,
   Terminal,
-  Bot
 } from "lucide-react";
 import { GameNav } from "@/components/game-nav";
+import { Loading } from "@/components/loading";
 import { AiMentorCard } from "@/components/ai-mentor-card";
 import { VictoryModal } from "@/components/victory-modal";
 import { gameApi } from "@/lib/game-api";
@@ -33,9 +33,7 @@ import type {
 const Editor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
   loading: () => (
-    <div className="grid h-[440px] place-items-center bg-slate-950 font-mono text-xs text-slate-500">
-      BOOTING QUANTUM MONACO BUFFER...
-    </div>
+    <Loading compact className="h-[440px] bg-slate-950" message="BOOTING QUANTUM MONACO BUFFER..." />
   )
 });
 
@@ -109,11 +107,8 @@ export default function MissionPage() {
     return (
       <div className="min-h-screen bg-slate-950 text-slate-100">
         <GameNav />
-        <main className="grid min-h-[70vh] place-items-center font-mono text-sm text-cyan-400">
-          <div className="flex items-center gap-3">
-            <Bot className="h-5 w-5 animate-spin" />
-            <span>DOWNLOADING MISSION BRIEFING...</span>
-          </div>
+        <main>
+          <Loading message="DOWNLOADING MISSION BRIEFING..." />
         </main>
       </div>
     );
