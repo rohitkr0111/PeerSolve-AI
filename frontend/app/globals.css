@@ -61,3 +61,31 @@
 [class~="bg-gradient-to-r"] { background-image: linear-gradient(90deg, var(--lime), #e9f8b8) !important; }
 [class~="bg-gradient-to-b"] { background-image: linear-gradient(180deg, rgba(255,255,255,.75), rgba(255,255,255,.35)) !important; }
 [class~="shadow-cyan-500/20"], [class~="shadow-cyan-950/30"] { box-shadow: 0 18px 45px rgba(18,18,18,.08) !important; }
+
+/* Collaborative Monaco cursor and selection styles */
+.yRemoteSelection {
+  opacity: 0.35;
+  margin-right: -1px;
+}
+.yRemoteSelectionHead {
+  position: absolute;
+  box-sizing: border-box;
+  height: 100%;
+  border-left: 2px solid #c9f36a;
+}
+.yRemoteSelectionHead::after {
+  position: absolute;
+  top: -1.35em;
+  left: -2px;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: inherit;
+  line-height: 1;
+  padding: 2px 5px;
+  border-radius: 4px;
+  color: #121212;
+  white-space: nowrap;
+  pointer-events: none;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  z-index: 20;
+}
