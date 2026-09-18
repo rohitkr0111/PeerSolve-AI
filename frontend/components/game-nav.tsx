@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
@@ -64,16 +65,23 @@ export function GameNav() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 border-b border-black/10 bg-[#f5f3ee]/90 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-[#dedbd3] bg-[#f5f3ee]/95 backdrop-blur-md">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
         {/* Brand */}
         <div className="flex items-center gap-3">
           <Link
             href="/world"
             onClick={() => sound.playClick()}
-            className="flex items-center gap-2 text-xl font-black tracking-[-.06em]"
+            className="flex items-center gap-3 sm:gap-3.5 text-xl font-black tracking-[-.06em] text-[#121212]"
           >
-            <span>peer<span className="text-[#ff765f]">solve</span><span className="ml-1 inline-block h-2 w-2 rounded-full bg-[#c9f36a]" /></span>
+            <Image
+              src="/peersolve-logo.png"
+              alt="PeerSolve"
+              width={42}
+              height={42}
+              className="h-10 w-10 sm:h-11 sm:w-11 object-contain"
+            />
+            <span>peer<span className="text-[#87965A]">solve</span><span className="ml-1 inline-block h-2 w-2 rounded-full bg-[#87965A]" /></span>
           </Link>
         </div>
 
@@ -90,10 +98,10 @@ export function GameNav() {
                 className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold tracking-wide transition-all ${
                   active
                     ? "bg-[#121212] text-white"
-                    : "text-[#706f6a] hover:bg-black/5 hover:text-[#121212]"
+                    : "text-[#6f6d67] hover:bg-black/5 hover:text-[#121212]"
                 }`}
               >
-                <Icon className={`h-3.5 w-3.5 ${active ? "text-[#c9f36a]" : "text-[#706f6a]"}`} />
+                <Icon className={`h-3.5 w-3.5 ${active ? "text-[#8fa85a]" : "text-[#6f6d67]"}`} />
                 {item.label}
               </Link>
             );
@@ -103,22 +111,22 @@ export function GameNav() {
         {/* Player HUD & Controls */}
         <div className="flex items-center gap-3">
           {profile && (
-            <div className="hidden items-center gap-3 rounded-xl border border-slate-800 bg-slate-900/60 px-3 py-1.5 sm:flex">
+            <div className="hidden items-center gap-3 rounded-xl border border-[#dedbd3] bg-white px-3 py-1.5 shadow-sm sm:flex">
               {/* Level Badge */}
-              <div className="flex items-center gap-1 font-mono text-xs font-bold text-cyan-400">
-                <Zap className="h-3.5 w-3.5 fill-cyan-400 text-cyan-400" />
+              <div className="flex items-center gap-1 font-mono text-xs font-bold text-[#121212]">
+                <Zap className="h-3.5 w-3.5 fill-[#8fa85a] text-[#8fa85a]" />
                 <span>LVL {profile.level}</span>
               </div>
 
               {/* XP Meter */}
               <div className="flex flex-col">
-                <div className="flex items-center justify-between gap-2 text-[10px] font-medium text-slate-400">
-                  <span>{profile.xp} XP</span>
-                  <span className="text-slate-500">NEXT: {profile.xpForNextLevel}</span>
+                <div className="flex items-center justify-between gap-2 text-[10px] font-medium text-[#6f6d67]">
+                  <span className="font-semibold text-[#121212]">{profile.xp} XP</span>
+                  <span>NEXT: {profile.xpForNextLevel}</span>
                 </div>
-                <div className="h-1.5 w-24 overflow-hidden rounded-full bg-slate-800">
+                <div className="h-1.5 w-24 overflow-hidden rounded-full bg-[#dedbd3]">
                   <div
-                    className="h-full rounded-full bg-gradient-to-r from-cyan-400 to-indigo-500 transition-all duration-500"
+                    className="h-full rounded-full bg-[#8fa85a] transition-all duration-500"
                     style={{
                       width: `${Math.min(
                         100,
@@ -135,8 +143,8 @@ export function GameNav() {
               </div>
 
               {/* Streak */}
-              <div className="flex items-center gap-1 rounded bg-amber-500/10 px-1.5 py-0.5 font-mono text-xs font-semibold text-amber-400">
-                <Flame className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+              <div className="flex items-center gap-1 rounded-full bg-[#c7b89a]/20 px-2 py-0.5 font-mono text-xs font-semibold text-[#6f6d67]">
+                <Flame className="h-3.5 w-3.5 fill-[#b86f5d] text-[#b86f5d]" />
                 <span>{profile.streakDays}d</span>
               </div>
             </div>
@@ -146,16 +154,16 @@ export function GameNav() {
           <button
             onClick={toggleSound}
             aria-label="Toggle Sound"
-            className="rounded-lg border border-black/10 bg-white/50 p-2 text-[#706f6a] transition hover:border-black/20 hover:text-[#121212]"
+            className="rounded-lg border border-[#dedbd3] bg-white p-2 text-[#6f6d67] transition hover:border-[#121212]/20 hover:text-[#121212] shadow-sm"
           >
-            {muted ? <VolumeX className="h-4 w-4 text-slate-500" /> : <Volume2 className="h-4 w-4 text-cyan-400" />}
+            {muted ? <VolumeX className="h-4 w-4 text-[#6f6d67]" /> : <Volume2 className="h-4 w-4 text-[#121212]" />}
           </button>
 
           {/* User Account / Logout */}
           <Link
             href="/dashboard"
             onClick={() => sound.playClick()}
-            className="hidden rounded-lg border border-black/10 bg-white/50 p-2 text-[#706f6a] transition hover:border-black/20 hover:text-[#121212] sm:flex"
+            className="hidden rounded-lg border border-[#dedbd3] bg-white p-2 text-[#6f6d67] transition hover:border-[#121212]/20 hover:text-[#121212] shadow-sm sm:flex"
             title="Player Command Center"
           >
             <UserIcon className="h-4 w-4" />
@@ -163,7 +171,7 @@ export function GameNav() {
 
           <button
             onClick={handleLogout}
-            className="hidden rounded-lg border border-[#ff765f]/30 bg-[#ff765f]/10 p-2 text-[#d94d3b] transition hover:bg-[#ff765f]/20 sm:flex"
+            className="hidden rounded-lg border border-[#dedbd3] bg-white p-2 text-[#6f6d67] transition hover:border-[#b86f5d]/40 hover:text-[#b86f5d] shadow-sm sm:flex"
             title="Logout"
           >
             <LogOut className="h-4 w-4" />
@@ -172,7 +180,7 @@ export function GameNav() {
           {/* Mobile menu button */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="rounded-lg border border-slate-800 p-2 text-slate-300 md:hidden"
+            className="rounded-lg border border-[#dedbd3] bg-white p-2 text-[#6f6d67] md:hidden"
           >
             {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
@@ -181,16 +189,16 @@ export function GameNav() {
 
       {/* Mobile Drawer */}
       {mobileOpen && (
-        <div className="border-b border-slate-800 bg-slate-950 px-4 py-4 md:hidden">
+        <div className="border-b border-[#dedbd3] bg-[#f5f3ee] px-4 py-4 md:hidden">
           {profile && (
-            <div className="mb-4 flex items-center justify-between rounded-xl border border-slate-800 bg-slate-900/60 p-3">
+            <div className="mb-4 flex items-center justify-between rounded-xl border border-[#dedbd3] bg-white p-3">
               <div className="flex items-center gap-2">
-                <Zap className="h-4 w-4 text-cyan-400" />
-                <span className="font-mono text-sm font-bold text-cyan-400">LVL {profile.level}</span>
-                <span className="text-xs text-slate-400">({profile.xp} XP)</span>
+                <Zap className="h-4 w-4 text-[#8fa85a]" />
+                <span className="font-mono text-sm font-bold text-[#121212]">LVL {profile.level}</span>
+                <span className="text-xs text-[#6f6d67]">({profile.xp} XP)</span>
               </div>
-              <div className="flex items-center gap-1 font-mono text-xs text-amber-400">
-                <Flame className="h-4 w-4 fill-amber-400 text-amber-400" />
+              <div className="flex items-center gap-1 font-mono text-xs text-[#6f6d67]">
+                <Flame className="h-4 w-4 fill-[#b86f5d] text-[#b86f5d]" />
                 <span>{profile.streakDays} days streak</span>
               </div>
             </div>
@@ -206,9 +214,9 @@ export function GameNav() {
                     sound.playClick();
                     setMobileOpen(false);
                   }}
-                  className="flex items-center gap-3 rounded-lg border border-slate-800 bg-slate-900/40 px-3 py-2 text-sm font-semibold text-slate-300"
+                  className="flex items-center gap-3 rounded-lg border border-[#dedbd3] bg-white px-3 py-2 text-sm font-semibold text-[#121212]"
                 >
-                  <Icon className="h-4 w-4 text-cyan-400" />
+                  <Icon className="h-4 w-4 text-[#8fa85a]" />
                   {item.label}
                 </Link>
               );
@@ -216,14 +224,14 @@ export function GameNav() {
             <Link
               href="/dashboard"
               onClick={() => setMobileOpen(false)}
-              className="flex items-center gap-3 rounded-lg border border-slate-800 bg-slate-900/40 px-3 py-2 text-sm font-semibold text-slate-300"
+              className="flex items-center gap-3 rounded-lg border border-[#dedbd3] bg-white px-3 py-2 text-sm font-semibold text-[#121212]"
             >
-              <UserIcon className="h-4 w-4 text-cyan-400" />
+              <UserIcon className="h-4 w-4 text-[#8fa85a]" />
               Command Center
             </Link>
             <button
               onClick={handleLogout}
-              className="flex w-full items-center gap-3 rounded-lg border border-rose-900/30 bg-rose-950/20 px-3 py-2 text-left text-sm font-semibold text-rose-400"
+              className="flex w-full items-center gap-3 rounded-lg border border-[#dedbd3] bg-white px-3 py-2 text-left text-sm font-semibold text-[#b86f5d]"
             >
               <LogOut className="h-4 w-4" />
               Logout

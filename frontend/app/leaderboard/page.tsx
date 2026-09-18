@@ -184,11 +184,20 @@ export default function LeaderboardPage() {
                 >
                   <td className="px-6 py-4 font-bold">
                     {entry.rank === 1 ? (
-                      <span className="text-amber-400">#1 👑</span>
+                      <span className="flex items-center gap-1 text-amber-400 font-bold">
+                        <Trophy className="h-3.5 w-3.5" />
+                        <span>#1</span>
+                      </span>
                     ) : entry.rank === 2 ? (
-                      <span className="text-slate-300">#2 🥈</span>
+                      <span className="flex items-center gap-1 text-zinc-300 font-bold">
+                        <Medal className="h-3.5 w-3.5 text-zinc-300" />
+                        <span>#2</span>
+                      </span>
                     ) : entry.rank === 3 ? (
-                      <span className="text-amber-600">#3 🥉</span>
+                      <span className="flex items-center gap-1 text-amber-600 font-bold">
+                        <Medal className="h-3.5 w-3.5 text-amber-600" />
+                        <span>#3</span>
+                      </span>
                     ) : (
                       `#${entry.rank}`
                     )}

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import {
-  Bot,
+  Sparkles,
   Lightbulb,
   CheckCircle2,
   ChevronRight,
@@ -81,7 +81,7 @@ export function AiMentorCard({
       <div className="flex items-center justify-between border-b border-zinc-800 pb-3.5">
         <div className="flex items-center gap-3">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600/10 text-indigo-400 border border-indigo-500/20">
-            <Bot className="h-4 w-4" />
+            <Sparkles className="h-4 w-4" />
           </div>
           <div>
             <div className="flex items-center gap-2">

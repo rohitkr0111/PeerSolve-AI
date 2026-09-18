@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Zap,
-  Globe,
   GitBranch,
   Skull,
   Trophy,
@@ -63,191 +62,271 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 text-slate-100">
+      <div className="min-h-screen bg-[#f5f3ee] text-[#121212]">
         <GameNav />
         <main>
-          <Loading message="INITIALIZING PLAYER COMMAND TELEMETRY..." />
+          <Loading message="Loading your command center..." />
         </main>
       </div>
     );
   }
 
+  const completedCount = profile?.completedMissions?.length || 0;
+  const streakDays = profile?.streakDays || 1;
+  const currentXp = profile?.xp || 0;
+  const nextLevelXp = profile?.xpForNextLevel || 100;
+  const currentLevelXp = profile?.xpForCurrentLevel || 0;
+  const xpProgress = Math.min(
+    100,
+    Math.max(
+      8,
+      ((currentXp - currentLevelXp) / Math.max(1, nextLevelXp - currentLevelXp)) * 100
+    )
+  );
+
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100">
+    <div className="min-h-screen bg-[#f5f3ee] text-[#121212]">
       <GameNav />
 
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
-        {/* Welcome Hero Card */}
-        <section className="relative overflow-hidden rounded-3xl border border-cyan-500/30 bg-gradient-to-r from-slate-900 via-slate-900 to-cyan-950/30 p-6 shadow-2xl backdrop-blur-md sm:p-10">
-          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-center">
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="rounded-full border border-cyan-500/40 bg-cyan-500/10 px-3 py-0.5 font-mono text-xs font-bold text-cyan-400">
-                  PLAYER STATUS: ONLINE
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:py-10">
+        {/* Welcome Hero / Mission Control */}
+        <section className="relative overflow-hidden rounded-3xl border border-[#dedbd3] bg-white p-6 shadow-sm sm:p-10 lg:p-12">
+          {/* Subtle Warm Accent Tints */}
+          <div className="pointer-events-none absolute -right-12 -top-12 h-64 w-64 rounded-full bg-[#8fa85a]/10 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-16 right-1/4 h-56 w-56 rounded-full bg-[#c7b89a]/15 blur-3xl" />
+
+          <div className="relative z-10 flex flex-col justify-between gap-8 lg:flex-row lg:items-center">
+            <div className="max-w-2xl">
+              <div className="flex flex-wrap items-center gap-2.5">
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-[#121212] px-3 py-1 font-mono text-xs font-bold text-white">
+                  <span className="h-2 w-2 rounded-full bg-[#8fa85a] animate-pulse" />
+                  ONLINE
                 </span>
-                <span className="flex items-center gap-1 font-mono text-xs text-amber-400">
-                  <Flame className="h-3.5 w-3.5 fill-amber-400" />
-                  <span>{profile?.streakDays || 1} Day Streak</span>
+                <span className="inline-flex items-center gap-1 rounded-full bg-[#c7b89a]/20 px-3 py-1 font-mono text-xs font-semibold text-[#6f6d67]">
+                  <Flame className="h-3.5 w-3.5 fill-[#b86f5d] text-[#b86f5d]" />
+                  {streakDays} Day Streak
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-full bg-[#dedbd3]/40 px-3 py-1 font-mono text-xs font-semibold text-[#6f6d67]">
+                  LVL {profile?.level || 1}
                 </span>
               </div>
-              <h1 className="mt-3 text-3xl font-black text-slate-100 sm:text-5xl">
-                Command Center: {user?.name || profile?.username || "Player"}
+
+              <h1 className="mt-4 text-3xl font-black tracking-[-.06em] text-[#121212] sm:text-5xl lg:text-[3.25rem] leading-[1.05]">
+                Welcome back, <span className="text-[#121212] underline decoration-[#8fa85a] decoration-4 underline-offset-4">{user?.name || profile?.username || "Player"}</span>
               </h1>
-              <p className="mt-2 text-sm text-slate-400">
-                Your neural link is synchronized. Level {profile?.level || 1} Algorithmic Agent.
+              <p className="mt-3 max-w-xl text-base text-[#6f6d67] sm:text-lg leading-relaxed">
+                Your personal mission control. Track algorithmic mastery, tackle curriculum missions, and test your skills in real-time.
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <Link
                 href="/world"
                 onClick={() => sound.playClick()}
-                className="flex items-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-400 to-indigo-500 px-6 py-3.5 font-mono text-xs font-bold text-slate-950 shadow-xl shadow-cyan-500/20 transition hover:opacity-90"
+                className="flex items-center gap-2.5 rounded-full bg-[#121212] px-7 py-4 text-sm font-bold text-white shadow-sm transition hover:bg-[#2a2a2a] hover:-translate-y-0.5"
               >
-                <Play className="h-4 w-4 fill-slate-950" />
-                <span>CONTINUE CAMPAIGN</span>
+                <Play className="h-4 w-4 fill-current text-[#8fa85a]" />
+                <span>Continue Campaign</span>
               </Link>
               <Link
                 href="/boss/boss-chrono-consumer"
                 onClick={() => sound.playClick()}
-                className="flex items-center gap-2 rounded-2xl border border-rose-500/40 bg-rose-500/10 px-6 py-3.5 font-mono text-xs font-bold text-rose-300 transition hover:bg-rose-500/20"
+                className="flex items-center gap-2 rounded-full border border-[#dedbd3] bg-[#f5f3ee] px-6 py-4 text-sm font-bold text-[#121212] transition hover:bg-white hover:-translate-y-0.5"
               >
-                <Skull className="h-4 w-4" />
-                <span>BOSS ARENA</span>
+                <Skull className="h-4 w-4 text-[#b86f5d]" />
+                <span>Boss Arena</span>
               </Link>
             </div>
           </div>
 
-          {/* XP Progress Bar in Banner */}
-          {profile && (
-            <div className="mt-8 border-t border-slate-800 pt-6">
-              <div className="flex justify-between font-mono text-xs text-slate-300">
-                <span className="flex items-center gap-1 text-cyan-400">
-                  <Zap className="h-3.5 w-3.5 fill-cyan-400" />
-                  <span>LEVEL {profile.level}</span>
-                </span>
-                <span>
-                  {profile.xp} / {profile.xpForNextLevel} XP (Next Level: {profile.xpForNextLevel - profile.xp} XP)
-                </span>
-              </div>
-              <div className="mt-2 h-2.5 w-full overflow-hidden rounded-full bg-slate-800">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-cyan-400 via-teal-300 to-indigo-500 transition-all duration-700"
-                  style={{
-                    width: `${Math.min(
-                      100,
-                      Math.max(
-                        5,
-                        ((profile.xp - profile.xpForCurrentLevel) /
-                          Math.max(1, profile.xpForNextLevel - profile.xpForCurrentLevel)) *
-                          100
-                      )
-                    )}%`
-                  }}
-                />
-              </div>
+          {/* XP Progress Bar */}
+          <div className="relative z-10 mt-8 border-t border-[#dedbd3] pt-6">
+            <div className="flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-[#6f6d67]">
+              <span className="flex items-center gap-1.5 font-bold text-[#121212]">
+                <Zap className="h-4 w-4 fill-[#8fa85a] text-[#8fa85a]" />
+                LEVEL {profile?.level || 1} PROGRESS
+              </span>
+              <span>
+                <strong className="font-bold text-[#121212]">{currentXp}</strong> / {nextLevelXp} XP ({nextLevelXp - currentXp} XP to Level {(profile?.level || 1) + 1})
+              </span>
             </div>
-          )}
+            <div className="mt-3 h-2.5 w-full overflow-hidden rounded-full bg-[#dedbd3]">
+              <div
+                className="h-full rounded-full bg-[#8fa85a] transition-all duration-700"
+                style={{ width: `${xpProgress}%` }}
+              />
+            </div>
+          </div>
         </section>
 
         {/* Tactical Metrics Grid */}
-        <section className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 backdrop-blur-sm">
-            <div className="flex items-center justify-between">
-              <span className="font-mono text-xs text-slate-400">TOTAL SCORE</span>
-              <Zap className="h-5 w-5 text-cyan-400" />
-            </div>
-            <p className="mt-3 font-mono text-3xl font-extrabold text-slate-100">
-              {profile?.xp || 0} <span className="text-xs text-cyan-400">XP</span>
-            </p>
-            <p className="mt-1 text-xs text-slate-500">Persisted in MongoDB</p>
+        <section className="mt-8">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-xl font-black tracking-[-.04em] text-[#121212] sm:text-2xl">
+              Performance Snapshot
+            </h2>
+            <span className="text-xs font-semibold text-[#6F6D67]">Real-time overview</span>
           </div>
 
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 backdrop-blur-sm">
-            <div className="flex items-center justify-between">
-              <span className="font-mono text-xs text-slate-400">MISSIONS CLEARED</span>
-              <CheckCircle2 className="h-5 w-5 text-emerald-400" />
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {/* Stat 1: Total XP */}
+            <div className="group rounded-3xl border border-[#dedbd3] bg-white p-6 shadow-sm transition hover:border-[#121212]/20">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#6f6d67]">Total Score</span>
+                <div className="grid h-9 w-9 place-items-center rounded-2xl bg-[#8fa85a]/15 text-[#8fa85a]">
+                  <Zap className="h-4 w-4 fill-current" />
+                </div>
+              </div>
+              <p className="mt-4 text-3xl font-black tracking-tight text-[#121212] sm:text-4xl">
+                {currentXp} <span className="text-base font-bold text-[#6f6d67]">XP</span>
+              </p>
+              <div className="mt-2 flex items-center gap-1.5 text-xs text-[#6f6d67]">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#8fa85a]" />
+                <span>Level {profile?.level || 1} ranking</span>
+              </div>
             </div>
-            <p className="mt-3 font-mono text-3xl font-extrabold text-slate-100">
-              {profile?.completedMissions.length || 0}
-            </p>
-            <p className="mt-1 text-xs text-slate-500">Across active sectors</p>
-          </div>
 
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 backdrop-blur-sm">
-            <div className="flex items-center justify-between">
-              <span className="font-mono text-xs text-slate-400">BOSSES SLAIN</span>
-              <Skull className="h-5 w-5 text-rose-400" />
+            {/* Stat 2: Missions Cleared */}
+            <div className="group rounded-3xl border border-[#dedbd3] bg-white p-6 shadow-sm transition hover:border-[#121212]/20">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#6f6d67]">Missions Cleared</span>
+                <div className="grid h-9 w-9 place-items-center rounded-2xl bg-[#8fa85a]/15 text-[#8fa85a]">
+                  <CheckCircle2 className="h-4 w-4" />
+                </div>
+              </div>
+              <p className="mt-4 text-3xl font-black tracking-tight text-[#121212] sm:text-4xl">
+                {completedCount}
+              </p>
+              <div className="mt-2 flex items-center gap-1.5 text-xs text-[#6f6d67]">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#8fa85a]" />
+                <span>Across active curriculums</span>
+              </div>
             </div>
-            <p className="mt-3 font-mono text-3xl font-extrabold text-slate-100">
-              {profile?.defeatedBosses.length || 0}
-            </p>
-            <p className="mt-1 text-xs text-slate-500">Multi-stage guardians</p>
-          </div>
 
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/50 p-6 backdrop-blur-sm">
-            <div className="flex items-center justify-between">
-              <span className="font-mono text-xs text-slate-400">ACCEPTANCE RATE</span>
-              <Code2 className="h-5 w-5 text-amber-400" />
+            {/* Stat 3: Bosses / Milestones */}
+            <div className="group rounded-3xl border border-[#dedbd3] bg-white p-6 shadow-sm transition hover:border-[#121212]/20">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#6f6d67]">Bosses Slain</span>
+                <div className="grid h-9 w-9 place-items-center rounded-2xl bg-[#b86f5d]/15 text-[#b86f5d]">
+                  <Skull className="h-4 w-4" />
+                </div>
+              </div>
+              <p className="mt-4 text-3xl font-black tracking-tight text-[#121212] sm:text-4xl">
+                {profile?.defeatedBosses?.length || 0}
+              </p>
+              <div className="mt-2 flex items-center gap-1.5 text-xs text-[#6f6d67]">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#b86f5d]" />
+                <span>Multi-stage milestones</span>
+              </div>
             </div>
-            <p className="mt-3 font-mono text-3xl font-extrabold text-slate-100">
-              {stats.acceptanceRate}%
-            </p>
-            <p className="mt-1 text-xs text-slate-500">
-              {stats.problemsSolved} / {stats.problemsAttempted} Practice runs
-            </p>
+
+            {/* Stat 4: Acceptance Rate */}
+            <div className="group rounded-3xl border border-[#dedbd3] bg-white p-6 shadow-sm transition hover:border-[#121212]/20">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold uppercase tracking-wider text-[#6f6d67]">Acceptance Rate</span>
+                <div className="grid h-9 w-9 place-items-center rounded-2xl bg-[#c7b89a]/30 text-[#6f6d67]">
+                  <Code2 className="h-4 w-4" />
+                </div>
+              </div>
+              <p className="mt-4 text-3xl font-black tracking-tight text-[#121212] sm:text-4xl">
+                {stats.acceptanceRate}%
+              </p>
+              <div className="mt-2 flex items-center gap-1.5 text-xs text-[#6f6d67]">
+                <span className="h-1.5 w-1.5 rounded-full bg-[#8fa85a]" />
+                <span>{stats.problemsSolved} / {stats.problemsAttempted} Practice runs</span>
+              </div>
+            </div>
           </div>
         </section>
 
-        {/* Quick Launch Cards */}
-        <section className="mt-8 grid gap-4 md:grid-cols-3">
-          <Link
-            href="/skill-tree"
-            onClick={() => sound.playClick()}
-            className="group rounded-2xl border border-slate-800 bg-slate-900/40 p-6 transition hover:-translate-y-1 hover:border-cyan-500/40"
-          >
-            <GitBranch className="h-8 w-8 text-cyan-400 group-hover:scale-110 transition-transform" />
-            <h3 className="mt-4 text-lg font-bold text-slate-100">Algorithmic Skill Tree</h3>
-            <p className="mt-1 text-xs text-slate-400">
-              Inspect your unlocked nodes and domain mastery percentages.
-            </p>
-            <div className="mt-4 flex items-center gap-1 font-mono text-xs text-cyan-400">
-              <span>View Tree</span>
-              <ArrowRight className="h-3.5 w-3.5" />
-            </div>
-          </Link>
+        {/* Interactive Feature Hub */}
+        <section className="mt-10">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-xl font-black tracking-[-.04em] text-[#121212] sm:text-2xl">
+              Curriculum &amp; Progression
+            </h2>
+            <span className="text-xs font-semibold text-[#6f6d67]">Interactive tracks</span>
+          </div>
 
-          <Link
-            href="/leaderboard"
-            onClick={() => sound.playClick()}
-            className="group rounded-2xl border border-slate-800 bg-slate-900/40 p-6 transition hover:-translate-y-1 hover:border-amber-500/40"
-          >
-            <Trophy className="h-8 w-8 text-amber-400 group-hover:scale-110 transition-transform" />
-            <h3 className="mt-4 text-lg font-bold text-slate-100">Global Leaderboard</h3>
-            <p className="mt-1 text-xs text-slate-400">
-              Check your rank on the live leaderboard compared to other cyber-agents.
-            </p>
-            <div className="mt-4 flex items-center gap-1 font-mono text-xs text-amber-400">
-              <span>Inspect Rankings</span>
-              <ArrowRight className="h-3.5 w-3.5" />
-            </div>
-          </Link>
+          <div className="grid gap-5 md:grid-cols-3">
+            {/* Card 1: Skill Tree */}
+            <Link
+              href="/skill-tree"
+              onClick={() => sound.playClick()}
+              className="group flex flex-col justify-between rounded-3xl border border-[#dedbd3] bg-white p-7 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md hover:border-[#121212]/20"
+            >
+              <div>
+                <div className="grid h-12 w-12 place-items-center rounded-2xl bg-[#8fa85a]/15 text-[#8fa85a] transition-transform duration-200 group-hover:scale-105">
+                  <GitBranch className="h-6 w-6" />
+                </div>
+                <h3 className="mt-5 text-xl font-black tracking-tight text-[#121212]">
+                  Algorithmic Skill Tree
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-[#6f6d67]">
+                  Visualize concept mastery across Arrays, Two Pointers, Trees, and Dynamic Programming.
+                </p>
+              </div>
 
-          <Link
-            href="/achievements"
-            onClick={() => sound.playClick()}
-            className="group rounded-2xl border border-slate-800 bg-slate-900/40 p-6 transition hover:-translate-y-1 hover:border-purple-500/40"
-          >
-            <Award className="h-8 w-8 text-purple-400 group-hover:scale-110 transition-transform" />
-            <h3 className="mt-4 text-lg font-bold text-slate-100">Trophy Vault</h3>
-            <p className="mt-1 text-xs text-slate-400">
-              View unlocked honors, badges, and rarity ratings for your milestones.
-            </p>
-            <div className="mt-4 flex items-center gap-1 font-mono text-xs text-purple-400">
-              <span>Open Vault</span>
-              <ArrowRight className="h-3.5 w-3.5" />
-            </div>
-          </Link>
+              <div className="mt-6 flex items-center justify-between border-t border-[#dedbd3] pt-4">
+                <span className="text-xs font-bold text-[#121212]">Explore Map</span>
+                <span className="grid h-8 w-8 place-items-center rounded-full bg-black/5 text-[#121212] transition-colors group-hover:bg-[#121212] group-hover:text-white">
+                  <ArrowRight className="h-4 w-4" />
+                </span>
+              </div>
+            </Link>
+
+            {/* Card 2: Leaderboard */}
+            <Link
+              href="/leaderboard"
+              onClick={() => sound.playClick()}
+              className="group flex flex-col justify-between rounded-3xl border border-[#dedbd3] bg-white p-7 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md hover:border-[#121212]/20"
+            >
+              <div>
+                <div className="grid h-12 w-12 place-items-center rounded-2xl bg-[#c7b89a]/30 text-[#6f6d67] transition-transform duration-200 group-hover:scale-105">
+                  <Trophy className="h-6 w-6 text-[#6f6d67]" />
+                </div>
+                <h3 className="mt-5 text-xl font-black tracking-tight text-[#121212]">
+                  Global Leaderboard
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-[#6f6d67]">
+                  Benchmark your velocity, solved challenges, and XP gains against fellow engineers globally.
+                </p>
+              </div>
+
+              <div className="mt-6 flex items-center justify-between border-t border-[#dedbd3] pt-4">
+                <span className="text-xs font-bold text-[#121212]">Inspect Standings</span>
+                <span className="grid h-8 w-8 place-items-center rounded-full bg-black/5 text-[#121212] transition-colors group-hover:bg-[#121212] group-hover:text-white">
+                  <ArrowRight className="h-4 w-4" />
+                </span>
+              </div>
+            </Link>
+
+            {/* Card 3: Badges / Vault */}
+            <Link
+              href="/achievements"
+              onClick={() => sound.playClick()}
+              className="group flex flex-col justify-between rounded-3xl border border-[#dedbd3] bg-white p-7 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md hover:border-[#121212]/20"
+            >
+              <div>
+                <div className="grid h-12 w-12 place-items-center rounded-2xl bg-[#b86f5d]/15 text-[#b86f5d] transition-transform duration-200 group-hover:scale-105">
+                  <Award className="h-6 w-6 text-[#b86f5d]" />
+                </div>
+                <h3 className="mt-5 text-xl font-black tracking-tight text-[#121212]">
+                  Trophy &amp; Badge Vault
+                </h3>
+                <p className="mt-2 text-sm leading-relaxed text-[#6f6d67]">
+                  Unlock special achievement honors, streak badges, and milestone trophies as you advance.
+                </p>
+              </div>
+
+              <div className="mt-6 flex items-center justify-between border-t border-[#dedbd3] pt-4">
+                <span className="text-xs font-bold text-[#121212]">Open Vault</span>
+                <span className="grid h-8 w-8 place-items-center rounded-full bg-black/5 text-[#121212] transition-colors group-hover:bg-[#121212] group-hover:text-white">
+                  <ArrowRight className="h-4 w-4" />
+                </span>
+              </div>
+            </Link>
+          </div>
         </section>
       </main>
     </div>
