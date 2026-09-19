@@ -19,3 +19,10 @@ export type CollaboratorPresence = {
 };
 
 export type ConnectionStatus = "idle" | "connecting" | "connected" | "disconnected" | "error";
+
+export type CollaborationChatMessage = {
+  userId: string;
+  name: string;
+  text: string;
+  sentAt: number;
+};

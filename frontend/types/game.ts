@@ -174,6 +174,7 @@ export interface LeaderboardEntry {
   bossesDefeated: number;
   streakDays: number;
   isCurrentPlayer: boolean;
+  isFollowing: boolean;
 }
 
 export interface Achievement {

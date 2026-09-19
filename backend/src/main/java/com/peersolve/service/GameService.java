@@ -504,7 +504,10 @@ public class GameService {
                 p.getCompletedMissions().size(),
                 p.getDefeatedBosses().size(),
                 p.getStreakDays(),
-                p.getUserId() != null && p.getUserId().equals(currentUserId)
+                p.getUserId() != null && p.getUserId().equals(currentUserId),
+                p.getUserId() != null && userRepo.findById(currentUserId)
+                    .map(user -> user.getFollowingIds().contains(p.getUserId()))
+                    .orElse(false)
             ));
         }
         return result;

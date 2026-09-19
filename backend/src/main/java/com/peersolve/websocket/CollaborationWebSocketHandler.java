@@ -65,6 +65,19 @@ public class CollaborationWebSocketHandler extends TextWebSocketHandler {
       return;
     }
 
+    if (payload.matches("\\{\\\"type\\\":\\\"chat\\\",\\\"text\\\":\\\".*")) {
+      String text = extractChatText(payload);
+      if (text.isBlank()) {
+        return;
+      }
+      String chatMessage = String.format(
+          "{\"type\":\"chat\",\"userId\":\"%s\",\"name\":\"%s\",\"text\":\"%s\",\"sentAt\":%d}",
+          escape(user.userId()), escape(user.name()), escape(text), System.currentTimeMillis()
+      );
+      broadcastToRoom(user.sessionId(), session, new TextMessage(chatMessage));
+      return;
+    }
+
     broadcastToRoom(user.sessionId(), session, message);
   }
 
@@ -133,5 +146,23 @@ public class CollaborationWebSocketHandler extends TextWebSocketHandler {
 
   private String escape(String s) {
     return s.replace("\\", "\\\\").replace("\"", "\\\"");
+  }
+
+  private String extractChatText(String payload) {
+    String marker = "\"text\":\"";
+    int start = payload.indexOf(marker);
+    if (start < 0) {
+      return "";
+    }
+    start += marker.length();
+    int end = payload.lastIndexOf("\"}");
+    if (end <= start) {
+      return "";
+    }
+    String text = payload.substring(start, end)
+        .replace("\\\"", "\"")
+        .replace("\\\\", "\\")
+      .trim();
+    return text.substring(0, Math.min(500, text.length()));
   }
 }

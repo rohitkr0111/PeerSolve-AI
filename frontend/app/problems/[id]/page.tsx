@@ -4,13 +4,13 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { Users, Copy, Check, LogOut } from "lucide-react";
+import { Users, Copy, Check, LogOut, MessageCircle } from "lucide-react";
 import api, { apiError } from "@/lib/api";
 import { auth } from "@/lib/auth";
 import { Badge, format } from "@/components/problem-ui";
 import { Loading } from "@/components/loading";
 import type { ExecutionResult, ProblemDetail, Submission } from "@/types/problems";
-import type { CollaborationSession, CollaboratorPresence, ConnectionStatus } from "@/types/collaboration";
+import type { CollaborationSession, CollaboratorPresence, ConnectionStatus, CollaborationChatMessage } from "@/types/collaboration";
 import { CollaborationClient } from "@/lib/collaboration";
 import type * as monaco from "monaco-editor";
 
@@ -49,6 +49,8 @@ function ProblemContent() {
   const [creatingSession, setCreatingSession] = useState(false);
   const [joiningSession, setJoiningSession] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [chatMessages, setChatMessages] = useState<CollaborationChatMessage[]>([]);
+  const [chatInput, setChatInput] = useState("");
 
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null);
   const monacoRef = useRef<typeof monaco | null>(null);
@@ -105,6 +107,7 @@ function ProblemContent() {
       onCodeChange: (updatedCode) => {
         // Shared code updated
       },
+      onChatMessage: (message) => setChatMessages((messages) => [...messages.slice(-49), message]),
     });
 
     collabClientRef.current = client;
@@ -120,6 +123,8 @@ function ProblemContent() {
       collabClientRef.current = null;
     }
     setCollaborators([]);
+    setChatMessages([]);
+    setChatInput("");
     setCollabStatus("idle");
     if (editorRef.current) {
       editorRef.current.setValue(code);
@@ -204,6 +209,25 @@ function ProblemContent() {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
+  };
+
+  const sendChatMessage = () => {
+    const message = chatInput.trim().slice(0, 500);
+    const client = collabClientRef.current;
+    if (!message || !client) return;
+    if (client.sendChat(message)) {
+      const currentUser = auth.user();
+      setChatMessages((messages) => [
+        ...messages.slice(-49),
+        {
+          userId: currentUser?.id ?? "guest",
+          name: currentUser?.name ?? "You",
+          text: message,
+          sentAt: Date.now(),
+        },
+      ]);
+      setChatInput("");
+    }
   };
 
   const execute = async (kind: "run" | "submit") => {
@@ -437,6 +461,41 @@ function ProblemContent() {
                   Waiting for peers… share the session link to code together!
                 </span>
               )}
+            </div>
+          )}
+
+          {mode === "peer" && activeSession && (
+            <div className="card p-4">
+              <div className="flex items-center gap-2 text-sm font-bold">
+                <MessageCircle className="h-4 w-4 text-cyan-400" />
+                Room Chat
+              </div>
+              <div className="mt-3 max-h-40 space-y-2 overflow-y-auto rounded-lg bg-slate-950 p-3">
+                {chatMessages.length === 0 ? (
+                  <p className="text-xs text-slate-500">Start a conversation with your peers.</p>
+                ) : (
+                  chatMessages.map((message, index) => (
+                    <p key={`${message.sentAt}-${index}`} className="text-xs text-slate-300">
+                      <span className="font-semibold text-cyan-300">{message.name}</span>
+                      <span className="mx-2 text-slate-600">•</span>
+                      {message.text}
+                    </p>
+                  ))
+                )}
+              </div>
+              <div className="mt-3 flex gap-2">
+                <input
+                  value={chatInput}
+                  maxLength={500}
+                  onChange={(event) => setChatInput(event.target.value)}
+                  onKeyDown={(event) => event.key === "Enter" && sendChatMessage()}
+                  placeholder="Message your peers..."
+                  className="min-w-0 flex-1 px-3 py-2 text-xs"
+                />
+                <button type="button" onClick={sendChatMessage} disabled={!chatInput.trim()} className="btn-primary px-3 py-2 text-xs disabled:opacity-50">
+                  Send
+                </button>
+              </div>
             </div>
           )}
 

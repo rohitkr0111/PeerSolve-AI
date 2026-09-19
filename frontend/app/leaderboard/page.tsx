@@ -8,15 +8,21 @@ import {
   Skull,
   Zap,
   CheckCircle2,
+  UserPlus,
+  UserCheck,
 } from "lucide-react";
 import { GameNav } from "@/components/game-nav";
 import { Loading } from "@/components/loading";
 import { gameApi } from "@/lib/game-api";
+import api from "@/lib/api";
+import { auth } from "@/lib/auth";
 import type { LeaderboardEntry } from "@/types/game";
 
 export default function LeaderboardPage() {
   const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [followBusy, setFollowBusy] = useState<string | null>(null);
+  const [followError, setFollowError] = useState("");
 
   useEffect(() => {
     gameApi
@@ -25,6 +31,27 @@ export default function LeaderboardPage() {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
+
+  const toggleFollow = async (userId: string, isFollowing: boolean) => {
+    if (!auth.user() || followBusy) return;
+    setFollowBusy(userId);
+    setFollowError("");
+    try {
+      const path = `/api/social/users/${userId}/follow`;
+      if (isFollowing) {
+        await api.delete(path);
+      } else {
+        await api.post(path);
+      }
+      setEntries((current) => current.map((entry) =>
+        entry.userId === userId ? { ...entry, isFollowing: !isFollowing } : entry
+      ));
+    } catch (error) {
+      setFollowError(error instanceof Error ? error.message : "Unable to update follow status.");
+    } finally {
+      setFollowBusy(null);
+    }
+  };
 
   const topThree = entries.slice(0, 3);
   const remaining = entries.slice(3);
@@ -57,6 +84,7 @@ export default function LeaderboardPage() {
           <p className="mt-2 text-sm text-slate-400">
             Real persisted player rankings calculated from mission completions, boss victories, and streaks.
           </p>
+          {followError && <p className="mt-3 text-sm text-rose-300">{followError}</p>}
         </div>
 
         {/* Top 3 Podium Cards */}
@@ -170,6 +198,7 @@ export default function LeaderboardPage() {
                 <th className="px-6 py-3.5">Missions</th>
                 <th className="px-6 py-3.5">Bosses</th>
                 <th className="px-6 py-3.5">Streak</th>
+                <th className="px-6 py-3.5">Connect</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-800/60">
@@ -206,6 +235,20 @@ export default function LeaderboardPage() {
                   <td className="px-6 py-4">{entry.missionsCompleted}</td>
                   <td className="px-6 py-4">{entry.bossesDefeated}</td>
                   <td className="px-6 py-4 text-amber-400">{entry.streakDays}d</td>
+                  <td className="px-6 py-4">
+                    {!entry.isCurrentPlayer && (
+                      <button
+                        type="button"
+                        onClick={() => toggleFollow(entry.userId, entry.isFollowing)}
+                        disabled={!auth.user() || followBusy === entry.userId}
+                        title={auth.user() ? (entry.isFollowing ? "Unfollow player" : "Follow player") : "Log in to follow players"}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-700 px-2.5 py-1.5 font-sans text-xs font-semibold text-slate-300 transition hover:border-cyan-400 hover:text-cyan-300 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {entry.isFollowing ? <UserCheck className="h-3.5 w-3.5" /> : <UserPlus className="h-3.5 w-3.5" />}
+                        {entry.isFollowing ? "Following" : "Follow"}
+                      </button>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>

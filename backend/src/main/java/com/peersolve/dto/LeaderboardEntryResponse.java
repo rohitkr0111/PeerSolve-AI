@@ -9,5 +9,6 @@ public record LeaderboardEntryResponse(
     int missionsCompleted,
     int bossesDefeated,
     int streakDays,
-    boolean isCurrentPlayer
+    boolean isCurrentPlayer,
+    boolean isFollowing
 ) {}

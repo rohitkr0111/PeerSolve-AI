@@ -3,6 +3,7 @@ import { Awareness, encodeAwarenessUpdate, applyAwarenessUpdate } from "y-protoc
 import { MonacoBinding } from "./y-monaco";
 import type * as monaco from "monaco-editor";
 import type { CollaboratorPresence, ConnectionStatus } from "@/types/collaboration";
+import type { CollaborationChatMessage } from "@/types/collaboration";
 
 const COLLAB_COLORS = [
   "#c9f36a", // PeerSolve lime
@@ -70,6 +71,7 @@ export interface CollaborationClientOptions {
   onStatusChange?: (status: ConnectionStatus) => void;
   onPresenceChange?: (collaborators: CollaboratorPresence[]) => void;
   onCodeChange?: (code: string) => void;
+  onChatMessage?: (message: CollaborationChatMessage) => void;
 }
 
 export class CollaborationClient {
@@ -200,6 +202,13 @@ export class CollaborationClient {
           // Re-send our awareness state
           const awarenessUpdate = encodeAwarenessUpdate(this.awareness, [this.doc.clientID]);
           this.ws?.send(JSON.stringify({ type: "awareness", update: Array.from(awarenessUpdate) }));
+        } else if (msg.type === "chat" && typeof msg.text === "string") {
+          this.options.onChatMessage?.({
+            userId: msg.userId || "peer",
+            name: msg.name || "Peer",
+            text: msg.text,
+            sentAt: Number(msg.sentAt) || Date.now(),
+          });
         }
       } catch (e) {
         console.error("Collaboration message parse error", e);
@@ -263,6 +272,13 @@ export class CollaborationClient {
 
   public getCode(): string {
     return this.ytext.toString();
+  }
+
+  public sendChat(text: string): boolean {
+    const cleanText = text.trim().slice(0, 500);
+    if (!cleanText || !this.ws || this.ws.readyState !== WebSocket.OPEN) return false;
+    this.ws.send(JSON.stringify({ type: "chat", text: cleanText }));
+    return true;
   }
 
   public destroy() {
