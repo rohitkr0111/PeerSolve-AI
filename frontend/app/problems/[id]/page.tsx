@@ -4,7 +4,8 @@ import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
-import { Users, Copy, Check, LogOut, MessageCircle } from "lucide-react";
+import { Users, Copy, Check, LogOut, MessageCircle, Sparkles } from "lucide-react";
+import { MentorChatPanel } from "@/components/mentor-chat-panel";
 import api, { apiError } from "@/lib/api";
 import { auth } from "@/lib/auth";
 import { Badge, format } from "@/components/problem-ui";
@@ -38,6 +39,9 @@ function ProblemContent() {
   const [result, setResult] = useState<ExecutionResult | null>(null);
   const [error, setError] = useState("");
   const [busy, setBusy] = useState<"run" | "submit" | null>(null);
+
+  // AI Mentor chat panel
+  const [showMentorChat, setShowMentorChat] = useState(false);
 
   // Collaboration state
   const [mode, setMode] = useState<"personal" | "peer">("personal");
@@ -553,6 +557,17 @@ function ProblemContent() {
             >
               {busy === "submit" ? "Submitting…" : "Submit"}
             </button>
+            <button
+              onClick={() => setShowMentorChat((v) => !v)}
+              className={`flex items-center gap-1.5 rounded-xl border px-4 py-2 text-sm font-semibold transition-all ${
+                showMentorChat
+                  ? "border-purple-500/60 bg-purple-500/20 text-purple-200"
+                  : "border-purple-500/40 bg-purple-500/10 text-purple-300 hover:bg-purple-500/20"
+              }`}
+            >
+              <Sparkles className="h-4 w-4" />
+              AI Mentor
+            </button>
           </div>
 
           {error && (
@@ -561,6 +576,25 @@ function ProblemContent() {
             </p>
           )}
           {result && <Results result={result} />}
+
+          {/* AI Mentor Chat Panel */}
+          {showMentorChat && (
+            <div className="h-[480px]">
+              <MentorChatPanel
+                problemId={id}
+                code={
+                  mode === "peer" && collabClientRef.current
+                    ? collabClientRef.current.getCode()
+                    : code
+                }
+                executionStatus={result?.status}
+                executionMessage={result?.output}
+                failingTest={result?.testCases?.find((t) => !t.passed)?.output}
+                onClose={() => setShowMentorChat(false)}
+              />
+            </div>
+          )}
+
           <History
             submissions={history}
             onSelect={(s) => {
